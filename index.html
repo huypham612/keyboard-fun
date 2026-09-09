@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Keyboard Fun</title>
+<style>
+  :root {
+    --bg1: #ffd6e8;
+    --bg2: #c7f0ff;
+    --ink: #2b2440;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: #111;
+    font-family: "Baloo 2", "Comic Sans MS", "Chalkboard SE", "Trebuchet MS", system-ui, sans-serif;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  #app {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--bg1), var(--bg2));
+    transition: background-image 420ms ease;
+    overflow: hidden;
+  }
+
+  /* ---------- idle screen ---------- */
+
+  #idle {
+    text-align: center;
+    color: var(--ink);
+    padding: 4vmin;
+  }
+  #idle .hi {
+    font-size: clamp(2.5rem, 9vmin, 7rem);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    margin: 0 0 1vmin;
+  }
+  #idle .sub {
+    font-size: clamp(1rem, 3vmin, 2rem);
+    opacity: 0.65;
+    font-weight: 700;
+    margin: 0;
+  }
+  #idle .keys {
+    font-size: clamp(3rem, 13vmin, 9rem);
+    letter-spacing: 0.1em;
+    animation: wiggle 2.4s ease-in-out infinite;
+  }
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(-3deg) scale(1); }
+    50%      { transform: rotate(3deg) scale(1.06); }
+  }
+
+  /* ---------- main stage ---------- */
+
+  #stage {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.5vmin;
+    width: 100%;
+    height: 100%;
+    padding: 3vmin;
+  }
+  #stage.on { display: flex; }
+
+  #row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5vmin;
+    flex-wrap: wrap;
+    max-width: 100%;
+  }
+
+  #glyph {
+    font-size: clamp(5rem, 46vmin, 32rem);
+    font-weight: 900;
+    line-height: 0.9;
+    color: #fff;
+    text-shadow:
+      0 0 0 #000,
+      6px 6px 0 rgba(0,0,0,0.16),
+      0 1.4vmin 3vmin rgba(0,0,0,0.22);
+    -webkit-text-stroke: 1.1vmin var(--ink);
+    paint-order: stroke fill;
+  }
+  #glyph:empty { display: none; }
+
+  #art {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.2vmin;
+    max-width: 52vw;
+    line-height: 1;
+    filter: drop-shadow(0 1.2vmin 2vmin rgba(0,0,0,0.25));
+  }
+  #art .item { font-size: 32vmin; }
+
+  #word {
+    font-size: clamp(1.8rem, 10vmin, 7rem);
+    font-weight: 900;
+    color: var(--ink);
+    background: rgba(255,255,255,0.72);
+    padding: 1vmin 4vmin;
+    border-radius: 999px;
+    box-shadow: 0 1vmin 2.4vmin rgba(0,0,0,0.14);
+    letter-spacing: 0.01em;
+    text-align: center;
+    max-width: 92vw;
+  }
+
+  .pop { animation: pop 520ms cubic-bezier(.2,1.5,.45,1) both; }
+  @keyframes pop {
+    0%   { transform: scale(0.2) rotate(-14deg); opacity: 0; }
+    60%  { transform: scale(1.12) rotate(4deg);  opacity: 1; }
+    100% { transform: scale(1) rotate(0deg);     opacity: 1; }
+  }
+
+  .popSoft { animation: popSoft 520ms cubic-bezier(.2,1.4,.45,1) both; }
+  @keyframes popSoft {
+    0%   { transform: translateY(4vmin) scale(0.8); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+  }
+
+  /* ---------- confetti ---------- */
+
+  .confetti {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 1.6vmin;
+    height: 2.6vmin;
+    border-radius: 0.4vmin;
+    pointer-events: none;
+    will-change: transform, opacity;
+    z-index: 5;
+  }
+
+  /* ---------- shapes ---------- */
+
+  #art svg { width: 52vmin; height: 52vmin; max-width: 62vw; }
+
+  /* ---------- hint bar ---------- */
+
+  #hint {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 1.2vmin 2vmin;
+    text-align: center;
+    font-size: clamp(0.7rem, 1.7vmin, 1.05rem);
+    font-weight: 700;
+    color: rgba(43,36,64,0.62);
+    background: rgba(255,255,255,0.42);
+    backdrop-filter: blur(6px);
+    transition: opacity 700ms ease;
+    z-index: 10;
+  }
+  #hint.hide { opacity: 0; }
+  #hint b { color: rgba(43,36,64,0.9); }
+
+  /* ---------- start overlay ---------- */
+
+  #gate {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3vmin;
+    background: linear-gradient(150deg, #ffe6a7, #ffc2e2 45%, #b8e6ff);
+    text-align: center;
+    padding: 5vmin;
+  }
+  #gate.gone { display: none; }
+  #gate h1 {
+    margin: 0;
+    font-size: clamp(2rem, 8vmin, 5.5rem);
+    font-weight: 900;
+    color: var(--ink);
+  }
+  #gate p {
+    margin: 0;
+    max-width: 46rem;
+    font-size: clamp(0.9rem, 2.4vmin, 1.4rem);
+    font-weight: 700;
+    color: rgba(43,36,64,0.7);
+    line-height: 1.6;
+  }
+  #play {
+    font: inherit;
+    font-size: clamp(1.4rem, 4.5vmin, 3rem);
+    font-weight: 900;
+    color: #fff;
+    background: #ff5fa2;
+    border: none;
+    border-radius: 999px;
+    padding: 2vmin 7vmin;
+    cursor: pointer;
+    box-shadow: 0 1.4vmin 0 #d63f80, 0 2vmin 3vmin rgba(0,0,0,0.2);
+    transition: transform 120ms ease, box-shadow 120ms ease;
+  }
+  #play:active {
+    transform: translateY(1vmin);
+    box-shadow: 0 0.4vmin 0 #d63f80, 0 1vmin 2vmin rgba(0,0,0,0.2);
+  }
+  #gate .row {
+    display: flex;
+    gap: 2vmin;
+    align-items: center;
+    font-size: clamp(0.8rem, 2vmin, 1.15rem);
+    font-weight: 700;
+    color: rgba(43,36,64,0.66);
+  }
+  #gate label { display: flex; align-items: center; gap: 0.8vmin; cursor: pointer; }
+  #gate input { width: 2.2vmin; height: 2.2vmin; min-width: 16px; min-height: 16px; accent-color: #ff5fa2; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pop, .popSoft, #idle .keys { animation: none !important; }
+    .confetti { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div id="idle">
+    <div class="keys">⌨️</div>
+    <p class="hi">Press any key!</p>
+    <p class="sub">Letters, numbers, arrows and the big space bar</p>
+  </div>
+
+  <div id="stage">
+    <div id="row">
+      <div id="glyph"></div>
+      <div id="art"></div>
+    </div>
+    <div id="word"></div>
+  </div>
+</div>
+
+<div id="hint">
+  <b>A–Z</b> letters &nbsp;·&nbsp; <b>0–9</b> numbers &nbsp;·&nbsp; <b>↑ →</b> next color &nbsp;·&nbsp; <b>↓ ←</b> color back &nbsp;·&nbsp; <b>space</b> shapes &nbsp;·&nbsp; <b>click</b> both &nbsp;·&nbsp; <b>esc</b> exits full screen
+</div>
+
+<div id="gate">
+  <h1>Keyboard Fun 🎉</h1>
+  <p>A letter, a picture and a friendly voice for every key they press. Tap the button once so the browser lets us talk.</p>
+  <button id="play">Let's play!</button>
+  <div class="row">
+    <label><input type="checkbox" id="fs" checked> Go full screen</label>
+    <label><input type="checkbox" id="snd" checked> Talking voice</label>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* =====================================================================
+     CONTENT — edit these lists to change words or pictures.
+     Format: KEY: ["Word", "emoji"]
+     ===================================================================== */
+
+  /* Knobs worth turning by ear. */
+  var PRESS_DELAY   = 400;    // shortest gap between presses, even for a short word
+  var WAIT_FOR_VOICE = true;  // and also wait until the whole phrase has been said
+  var VOICE_TIMEOUT = 4000;   // safety net if a browser never reports the end
+  var VOICE_RATE  = 0.9;   // 1 is normal speed
+  var VOICE_PITCH = 1.1;   // 1 is normal, higher is brighter
+
+  var LETTERS = {
+    A: ["Apple", "🍎"],
+    B: ["Ball", "⚽"],
+    C: ["Cat", "🐱"],
+    D: ["Dog", "🐶"],
+    E: ["Elephant", "🐘"],
+    F: ["Fish", "🐠"],
+    G: ["Grapes", "🍇"],
+    H: ["House", "🏠"],
+    I: ["Ice cream", "🍦"],
+    J: ["Juice", "🧃"],
+    K: ["Kite", "🪁"],
+    L: ["Lion", "🦁"],
+    M: ["Moon", "🌙"],
+    N: ["Nest", "🪺"],
+    O: ["Orange", "🍊"],
+    P: ["Penguin", "🐧"],
+    Q: ["Queen", "👸"],
+    R: ["Rainbow", "🌈"],
+    S: ["Sun", "☀️"],
+    T: ["Tree", "🌳"],
+    U: ["Umbrella", "☂️"],
+    V: ["Violin", "🎻"],
+    W: ["Watermelon", "🍉"],
+    X: ["X-ray", "🩻"],
+    Y: ["Yo-yo", "🪀"],
+    Z: ["Zebra", "🦓"]
+  };
+
+  // Numbers: [word, emoji to repeat, plural noun for the sentence]
+  var NUMBERS = {
+    "0": ["Zero", "", "nothing at all"],
+    "1": ["One", "⭐", "star"],
+    "2": ["Two", "🐥", "chicks"],
+    "3": ["Three", "🎈", "balloons"],
+    "4": ["Four", "🍓", "strawberries"],
+    "5": ["Five", "🐠", "fish"],
+    "6": ["Six", "🌸", "flowers"],
+    "7": ["Seven", "🚗", "cars"],
+    "8": ["Eight", "🍪", "cookies"],
+    "9": ["Nine", "🐝", "bees"]
+  };
+
+  // [name, the disc, the soft background behind it]
+  var COLORS = [
+    ["Red",    "#ff3b30", "#ffd9d6"],
+    ["Orange", "#ff8c1a", "#ffe6cc"],
+    ["Yellow", "#fcc419", "#fff3cf"],
+    ["Green",  "#2f9e44", "#d6f2de"],
+    ["Blue",   "#1c7ed6", "#d2e7ff"],
+    ["Purple", "#9333ea", "#ecd9ff"],
+    ["Pink",   "#ff5fa2", "#ffd9ea"],
+    ["Brown",  "#8b5a2b", "#ecdcc9"],
+    ["Gray",   "#8d949e", "#e6e8eb"],
+    ["Black",  "#1b1b1f", "#d8d9dd"],
+    ["White",  "#ffffff", "#c9d2de"]
+  ];
+
+  var SHAPES = [
+    ["Circle",    '<circle cx="50" cy="50" r="42"/>'],
+    ["Square",    '<rect x="12" y="12" width="76" height="76" rx="6"/>'],
+    ["Triangle",  '<polygon points="50,8 92,88 8,88"/>'],
+    ["Rectangle", '<rect x="4" y="26" width="92" height="48" rx="6"/>'],
+    ["Star",      '<polygon points="50,5 61,38 96,38 68,59 79,92 50,71 21,92 32,59 4,38 39,38"/>'],
+    ["Heart",     '<path d="M50 88C22 68 8 52 8 34 8 20 19 10 32 10c8 0 15 4 18 10 3-6 10-10 18-10 13 0 24 10 24 24 0 18-14 34-42 54z"/>'],
+    ["Oval",      '<ellipse cx="50" cy="50" rx="46" ry="30"/>'],
+    ["Diamond",   '<polygon points="50,5 92,50 50,95 8,50"/>'],
+    ["Moon",      '<path d="M74.7 8.6A42 42 0 1 0 74.7 91.4A44 44 0 0 1 74.7 8.6Z"/>'],
+    ["Pentagon",  '<polygon points="50,7 92.8,38.1 76.5,88.4 23.5,88.4 7.2,38.1"/>'],
+    ["Hexagon",   '<polygon points="95,50 72.5,89 27.5,89 5,50 27.5,11 72.5,11"/>'],
+    ["Octagon",   '<polygon points="91.6,67.2 67.2,91.6 32.8,91.6 8.4,67.2 8.4,32.8 32.8,8.4 67.2,8.4 91.6,32.8"/>'],
+    ["Arrow",     '<polygon points="8,38 58,38 58,18 95,50 58,82 58,62 8,62"/>'],
+    ["Cross",     '<polygon points="36,8 64,8 64,36 92,36 92,64 64,64 64,92 36,92 36,64 8,64 8,36 36,36"/>']
+  ];
+
+  // Deterministic background pairs, so "A" always looks the same each time.
+  var SKIES = [
+    ["#ffe0ec", "#ffd6a5"], ["#d8f3dc", "#a8dadc"], ["#e0d7ff", "#c9e9ff"],
+    ["#ffe8c2", "#ffc9de"], ["#cdf0ea", "#f9f6c5"], ["#ffd6e0", "#c1e1ff"],
+    ["#e5f8c8", "#bde0fe"], ["#ffe5d0", "#d5c6ff"], ["#c9f2ff", "#ffe6f7"],
+    ["#f6e3ff", "#d0f4de"]
+  ];
+
+  var CONFETTI_COLORS = ["#ff5fa2", "#ffc93c", "#4dabf7", "#69db7c", "#b197fc", "#ff922b"];
+
+  /* =====================================================================
+     ELEMENTS + STATE
+     ===================================================================== */
+
+  var app   = document.getElementById("app");
+  var idle  = document.getElementById("idle");
+  var stage = document.getElementById("stage");
+  var glyph = document.getElementById("glyph");
+  var art   = document.getElementById("art");
+  var word  = document.getElementById("word");
+  var hint  = document.getElementById("hint");
+  var gate  = document.getElementById("gate");
+  var playBtn = document.getElementById("play");
+  var fsBox   = document.getElementById("fs");
+  var sndBox  = document.getElementById("snd");
+
+  var soundOn = true;
+  var shapeIndex = 0;
+  var colorIndex = 0;
+  var colorSeen = false;
+  var clickTurn = 0;
+  var lastPressAt = 0;
+  var speakTimer = null;
+  var unlockTimer = null;
+  var speaking = false;
+  var speakSeq = 0;
+  var hintTimer = null;
+
+  /* =====================================================================
+     VOICE
+     ===================================================================== */
+
+  var synth = window.speechSynthesis || null;
+  var voice = null;
+
+  // The voice to speak with. Matched by name, so "Samantha" also finds
+  // "Samantha (Enhanced)" and takes it when that better build is installed.
+  var VOICE_NAME = "Samantha";
+
+  function pickVoice() {
+    if (!synth) return;
+    var all = synth.getVoices() || [];
+    var found = null;
+    for (var i = 0; i < all.length; i++) {
+      if (all[i].name.indexOf(VOICE_NAME) !== 0) continue;
+      if (!found || /enhanced|premium/i.test(all[i].name)) found = all[i];
+    }
+    // If that voice isn't installed, leave it: the browser uses its own default.
+    if (found) voice = found;
+  }
+
+  if (synth) {
+    pickVoice();
+    synth.addEventListener("voiceschanged", pickVoice);
+    // Chrome on file:// sometimes populates the list late and without an event.
+    setTimeout(pickVoice, 300);
+    setTimeout(pickVoice, 1200);
+  }
+
+  function say(text) {
+    if (!soundOn || !synth || !text) { speaking = false; return; }
+    // A toddler mashes keys. Drop whatever is mid-sentence and say the newest thing.
+    clearTimeout(speakTimer);
+    try { synth.cancel(); } catch (e) { /* some browsers throw when idle */ }
+
+    // Chrome clips or garbles an utterance queued in the same tick as a
+    // cancel(), which is most of the roughness. Let the queue drain first.
+    // Each utterance carries a ticket. A late onend from a cancelled one must
+    // not unlock the gate that the newest utterance is holding.
+    var mine = ++speakSeq;
+    speaking = true;
+
+    speakTimer = setTimeout(function () {
+      var u = new SpeechSynthesisUtterance(text);
+      if (voice) { u.voice = voice; u.lang = voice.lang; }
+      u.rate = VOICE_RATE;
+      u.pitch = VOICE_PITCH;
+      u.volume = 1;
+      u.onend = u.onerror = function () { if (mine === speakSeq) speaking = false; };
+      try { synth.speak(u); } catch (e) { speaking = false; }
+    }, 90);
+
+    clearTimeout(unlockTimer);
+    unlockTimer = setTimeout(function () {
+      if (mine === speakSeq) speaking = false;
+    }, VOICE_TIMEOUT);
+  }
+
+  // One pace for the whole toy. Without it a fast hand blurs through a dozen
+  // things before a child has looked at any of them, and every sentence gets cut
+  // off by the next one. Roughly the length of a spoken "A for Apple".
+  function ready() {
+    if (Date.now() - lastPressAt < PRESS_DELAY) return false;
+    // "Red!" takes a third of a second, "Four. Four strawberries!" takes two.
+    // Waiting on the voice itself fits both, where one fixed number cannot.
+    if (WAIT_FOR_VOICE && speaking) return false;
+    lastPressAt = Date.now();
+    return true;
+  }
+
+  /* =====================================================================
+     LOOK
+     ===================================================================== */
+
+  function hashOf(str) {
+    var h = 0;
+    for (var i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) | 0;
+    return Math.abs(h);
+  }
+
+  function setSky(seed) {
+    var pair = SKIES[hashOf(seed) % SKIES.length];
+    app.style.setProperty("--bg1", pair[0]);
+    app.style.setProperty("--bg2", pair[1]);
+  }
+
+  function confetti() {
+    var n = 16;
+    for (var i = 0; i < n; i++) {
+      let bit = document.createElement("div");
+      bit.className = "confetti";
+      bit.style.background = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
+      document.body.appendChild(bit);
+
+      var angle = (Math.PI * 2 * i) / n + Math.random() * 0.4;
+      var dist = 22 + Math.random() * 30;              // vmin
+      var dx = Math.cos(angle) * dist;
+      var dy = Math.sin(angle) * dist;
+
+      bit.animate(
+        [
+          { transform: "translate(-50%, -50%) scale(0.4) rotate(0deg)", opacity: 1 },
+          { transform: "translate(calc(-50% + " + dx + "vmin), calc(-50% + " + dy + "vmin)) scale(1) rotate(" + (Math.random() * 720 - 360) + "deg)", opacity: 0 }
+        ],
+        { duration: 900 + Math.random() * 350, easing: "cubic-bezier(.15,.7,.3,1)" }
+      ).onfinish = function () { bit.remove(); };
+    }
+  }
+
+  function replay(el, cls) {
+    el.classList.remove(cls);
+    void el.offsetWidth;   // force reflow so the animation restarts on repeat presses
+    el.classList.add(cls);
+  }
+
+  function show(opts) {
+    idle.style.display = "none";
+    stage.classList.add("on");
+
+    glyph.textContent = opts.glyph || "";
+    art.innerHTML = opts.art || "";
+    word.textContent = opts.word || "";
+
+    setSky(opts.seed);
+    replay(glyph, "pop");
+    replay(art, "pop");
+    replay(word, "popSoft");
+    confetti();
+    say(opts.speech);
+  }
+
+  function emojiItems(emoji, count) {
+    if (!emoji || count < 1) return "";
+    var size = count <= 1 ? 36 : count <= 3 ? 26 : count <= 6 ? 18 : 13;   // vmin
+    var out = "";
+    for (var i = 0; i < count; i++) {
+      out += '<span class="item" style="font-size:' + size + 'vmin">' + emoji + "</span>";
+    }
+    return out;
+  }
+
+  /* =====================================================================
+     HANDLERS
+     ===================================================================== */
+
+  function doLetter(ch) {
+    var entry = LETTERS[ch];
+    if (!entry) return;
+    // "A is for Apple", not "A for Apple". A lone "A" before "for" can be read
+    // as the word "a"; as the subject of "A is..." it cannot be.
+    var line = ch + " is for " + entry[0];
+    show({
+      seed: ch,
+      glyph: ch,
+      art: emojiItems(entry[1], 1),
+      word: line,
+      speech: line + "!"
+    });
+  }
+
+  function doNumber(d) {
+    var entry = NUMBERS[d];
+    if (!entry) return;
+    var count = parseInt(d, 10);
+    var artHtml = count === 0
+      ? '<span class="item" style="font-size:30vmin;opacity:.35">🫧</span>'
+      : emojiItems(entry[1], count);
+    show({
+      seed: "n" + d,
+      glyph: d,
+      art: artHtml,
+      word: entry[0],
+      speech: count === 0
+        ? "Zero. Nothing at all!"
+        : entry[0] + ". " + entry[0] + " " + entry[2] + "!"
+    });
+  }
+
+  // step is +1 for the next color, -1 for the one before. The very first
+  // press lands on Red whichever way they go.
+  function doColor(step) {
+    if (colorSeen) colorIndex = (colorIndex + step + COLORS.length) % COLORS.length;
+    else colorSeen = true;
+    var entry = COLORS[colorIndex];
+    var name = entry[0], solid = entry[1], soft = entry[2];
+    app.style.setProperty("--bg1", soft);
+    app.style.setProperty("--bg2", "#ffffff");
+
+    idle.style.display = "none";
+    stage.classList.add("on");
+    glyph.textContent = "";
+    art.innerHTML =
+      '<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="' + solid +
+      '" stroke="rgba(43,36,64,0.3)" stroke-width="1.6"/></svg>';   // the outline is what makes White show up
+    word.textContent = name;
+
+    replay(art, "pop");
+    replay(word, "popSoft");
+    confetti();
+    say(name + "!");
+  }
+
+  function doShape() {
+    var entry = SHAPES[shapeIndex % SHAPES.length];
+    shapeIndex++;
+    var fill = CONFETTI_COLORS[hashOf(entry[0]) % CONFETTI_COLORS.length];
+    show({
+      seed: "s" + entry[0],
+      glyph: "",
+      art: '<svg viewBox="0 0 100 100" aria-hidden="true"><g fill="' + fill + '">' + entry[1] + "</g></svg>",
+      word: entry[0],
+      speech: entry[0] + "!"
+    });
+  }
+
+  function onKeyDown(e) {
+    // Let the grown-ups keep their browser shortcuts (Cmd+Q, Ctrl+W, ...).
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.repeat) return;                    // keys get held down; react once
+    if (!gate.classList.contains("gone")) return;
+
+    var key = e.key;
+
+    // Space and the arrows scroll the page, so swallow them up front, before
+    // the cooldown gets a chance to drop the press.
+    if (key === " " || e.code === "Space" || key.indexOf("Arrow") === 0) e.preventDefault();
+
+    // Work out what the key means first. An unmapped key (tab, enter,
+    // punctuation) is ignored on purpose, and must not spend the cooldown or
+    // it would swallow the real press that follows it.
+    var act = null;
+    if (key === " " || e.code === "Space") {
+      act = doShape;
+    } else if (key === "ArrowUp" || key === "ArrowRight") {
+      act = function () { doColor(1); };
+    } else if (key === "ArrowDown" || key === "ArrowLeft") {
+      act = function () { doColor(-1); };
+    } else if (key.length === 1) {
+      var up = key.toUpperCase();
+      if (LETTERS[up]) act = function () { doLetter(up); };
+      else if (NUMBERS[key]) act = function () { doNumber(key); };
+    }
+
+    if (!act || !ready()) return;
+    act();
+  }
+
+  /* =====================================================================
+     HINT BAR — visible for a moment, then out of the way
+     ===================================================================== */
+
+  function nudgeHint() {
+    hint.classList.remove("hide");
+    clearTimeout(hintTimer);
+    hintTimer = setTimeout(function () { hint.classList.add("hide"); }, 6000);
+  }
+
+  window.addEventListener("mousemove", nudgeHint);
+
+  /* =====================================================================
+     START
+     ===================================================================== */
+
+  function start() {
+    soundOn = sndBox.checked;
+
+    if (fsBox.checked && document.documentElement.requestFullscreen) {
+      var p = document.documentElement.requestFullscreen();
+      if (p && p.catch) p.catch(function () { /* browser said no; play windowed */ });
+    }
+
+    // Speaking once inside the click unlocks the voice in browsers that require a gesture.
+    if (soundOn && synth) {
+      pickVoice();
+      // Kept short on purpose: presses are gated on the voice, so a long
+      // greeting would be a dead patch right when the keyboard gets grabbed.
+      say("Let's play!");
+    }
+
+    gate.classList.add("gone");
+    nudgeHint();
+    window.focus();
+  }
+
+  playBtn.addEventListener("click", start);
+  fsBox.addEventListener("click", function (e) { e.stopPropagation(); });
+  sndBox.addEventListener("click", function (e) { e.stopPropagation(); });
+
+  window.addEventListener("keydown", onKeyDown);
+
+  // Tapping the screen also advances, for a touchscreen or a wandering finger.
+  app.addEventListener("pointerdown", function () {
+    if (!gate.classList.contains("gone")) return;
+    // A blocked click must not take its turn, or shape/colour order drifts.
+    if (!ready()) return;
+    if (clickTurn % 2 === 0) doShape(); else doColor(1);
+    clickTurn++;
+  });
+
+  // Stop the browser scrolling or zooming under small palms.
+  window.addEventListener("wheel", function (e) { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
+  window.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+})();
+</script>
+</body>
+</html>

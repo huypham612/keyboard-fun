@@ -1,0 +1,151 @@
+# Keyboard Fun
+
+A keyboard toy for toddlers, for the age where mashing a laptop keyboard is
+the entertainment. Every key press puts a big letter, a big picture and a
+friendly voice on the screen.
+
+## How to play
+
+Double-click `index.html`. That's the whole install. It is one file with no
+dependencies, no build step and no server, and it works with the wifi off.
+
+Click **Let's play!** once. That click is what lets the browser use its voice,
+so it can't be skipped.
+
+| Key | What happens |
+| --- | --- |
+| `A`–`Z` | The letter, a picture, and "A for Apple!" |
+| `0`–`9` | The digit, that many objects (3 shows three balloons), and "Three. Three balloons!" |
+| `↑` or `→` | The next color |
+| `↓` or `←` | The color before |
+| Space bar | The next shape |
+| Click / tap | Alternates: a shape, then a color, then a shape... |
+| Everything else | Nothing, on purpose. |
+
+Eleven colors: red, orange, yellow, green, blue, purple, pink, brown, gray,
+black, white. They wrap around, so a child can hold one direction and go round
+and round.
+
+Fourteen shapes: circle, square, triangle, rectangle, star, heart, oval,
+diamond, moon, pentagon, hexagon, octagon, arrow, cross.
+
+Press `esc` to leave full screen.
+
+## Notes for the grown-up
+
+* Holding a key down fires once, not fifty times, and presses that arrive
+  inside the `PRESS_DELAY` window are dropped rather than queued, so the toy
+  never runs on for a minute working through a backlog.
+* `Cmd` / `Ctrl` / `Alt` combos are passed straight through, so your own
+  shortcuts still work.
+* Each letter always gets the same background colors, giving a second cue to
+  recognize it by.
+* Full screen hides the tabs and the address bar, but it cannot stop `Cmd+Q`.
+  If you want it properly locked down, launch it in a kiosk window:
+
+  ```
+  open -na "Google Chrome" --args --kiosk --app="file://$PWD/index.html"
+  ```
+
+## Choosing the voice
+
+The app asks for one voice by name:
+
+```js
+var VOICE_NAME = "Samantha";
+```
+
+It matches on the name, so "Samantha" also finds "Samantha (Enhanced)" and takes
+that better build when it is installed. If no Samantha exists on the machine at
+all, the browser falls back to its own default rather than picking something
+strange. To use a different voice, change that one string.
+
+Changing the macOS **System voice** in Settings does *not* affect this app. The
+browser keeps its own voice list.
+
+### Which one
+
+Among what is installed on this Mac, **Samantha** is the best US English voice,
+which is why Samantha is the one named. Karen (Australian), Tessa (South African),
+Moira (Irish) and Daniel (British) are comparable quality with an accent, if you
+want to try one in `VOICE_NAME`. Avoid the Novelty voices (Zarvox, Bahh,
+Bubbles and friends): a toddler might enjoy them, but they will not teach what
+a letter sounds like.
+
+**The Siri voices in the System Settings menu cannot be used.** They are
+reserved for macOS itself and are not handed to browsers or to any other app.
+Of the 184 voices installed here, none are Siri, and asking for one directly
+fails outright (`Speaking failed: -241`). So ignore that submenu.
+
+### The real upgrade
+
+Every voice on this Mac is currently the **compact** build, which is the rough,
+slightly robotic one. macOS has much better builds of the same voices as a free
+download. On macOS 26 the button is called **Customize...**, not "Manage
+Voices..." as it was on older versions:
+
+1. System Settings -> Accessibility -> **Read & Speak**
+2. Click the **System voice** popup
+3. Scroll the menu all the way past the Novelty group (Albert ... Zarvox). The
+   list is taller than the screen, so **Customize...** sits below Zarvox, out
+   of sight until you scroll
+4. In the sheet, find Samantha under English (United States) and tick the
+   **Enhanced** or **Premium** entry. It shows you the download size, and a
+   **Play** button to hear a voice before committing
+
+Once downloaded, the app prefers the better build automatically, no code change
+needed. This is by far the biggest improvement available, much bigger than
+switching between the compact voices.
+
+## Pacing and pronunciation
+
+The knobs sit at the top of the `<script>` tag:
+
+```js
+var PRESS_DELAY    = 400;    // shortest gap between presses, even for a short word
+var WAIT_FOR_VOICE = true;   // and also wait until the whole phrase has been said
+var VOICE_TIMEOUT  = 4000;   // safety net if a browser never reports the end
+var VOICE_RATE     = 0.9;    // 1 is normal speed
+var VOICE_PITCH    = 1.1;    // 1 is normal, higher is brighter
+```
+
+A single fixed delay could not work here, because the phrases are wildly
+different lengths: "Red!" takes 0.33s to say, while "Four. Four strawberries!"
+takes 2.0s. A gap long enough for the numbers makes the colors feel dead, and a
+gap short enough for the colors cuts the numbers off halfway.
+
+So the toy waits for the **voice itself** to finish, with `PRESS_DELAY` as a
+floor underneath. Everything shares it: letters, numbers, shapes, colors and
+clicks. Set `WAIT_FOR_VOICE` to `false` if you would rather have the fixed gap
+only, and raise `PRESS_DELAY` to slow things down further.
+
+Two details worth knowing:
+
+* Keys that do nothing (tab, enter, punctuation) don't spend the timer, so
+  brushing one won't swallow the real key that follows it.
+* If a browser ever loses an utterance and never reports its end, the toy would
+  lock up. `VOICE_TIMEOUT` releases it after 4 seconds regardless.
+
+### Why "A is for Apple"
+
+The wording matters more than it looks. A lone "A" before "for" can be read by a
+speech engine as the word *a*, which is what made the letter sound wrong at
+first. As the subject of "A **is** for Apple" it cannot be, since an article
+can't be the subject of a sentence. That phrasing fixed it with no special
+cases, and it is the classic alphabet-book wording anyway.
+
+## Changing the words
+
+Everything editable sits in one block near the top of the `<script>` tag in
+`index.html`, marked `CONTENT`. Each entry is `KEY: ["Word", "emoji"]`:
+
+```js
+A: ["Apple", "🍎"],
+```
+
+Swap in your child's own favorites (their name, the family pet, a food they
+like) and reload the page. Numbers take a third value, the plural noun the voice says:
+`"3": ["Three", "🎈", "balloons"]`.
+
+`X` is the awkward one. It currently says "X for X-ray" with 🩻, because there
+is no xylophone emoji. Change it if you'd rather.
