@@ -4,10 +4,14 @@ A keyboard toy for toddlers, for the age where mashing a laptop keyboard is
 the entertainment. Every key press puts a big letter, a big picture and a
 friendly voice on the screen.
 
+**[Play it here](https://huypham612.github.io/keyboard-fun/)** — nothing to
+install, it runs in the browser.
+
 ## How to play
 
-Double-click `index.html`. That's the whole install. It is one file with no
-dependencies, no build step and no server, and it works with the wifi off.
+Open the link above, or download `index.html` and double-click it. Either way
+that's the whole install: one file, no dependencies, no build step and no
+server. The downloaded copy works with the wifi off.
 
 Click **Let's play!** once. That click is what lets the browser use its voice,
 so it can't be skipped.
