@@ -113,6 +113,7 @@
     filter: drop-shadow(0 1.2vmin 2vmin rgba(0,0,0,0.25));
   }
   #art .item { font-size: 32vmin; }
+  #art .photo { border-radius: 50%; object-fit: cover; }
 
   #word {
     font-size: clamp(1.8rem, 10vmin, 7rem);
@@ -536,12 +537,18 @@
     say(opts.speech);
   }
 
-  function emojiItems(emoji, count) {
-    if (!emoji || count < 1) return "";
+  // A picture is normally an emoji, but an image works too: pass a file next
+  // to this one or a data: URI, e.g. K: ["Kite", "kite.jpg"]. Handy for
+  // putting a photo of someone the child knows on their initial.
+  function pictureItems(pic, count) {
+    if (!pic || count < 1) return "";
     var size = count <= 1 ? 36 : count <= 3 ? 26 : count <= 6 ? 18 : 13;   // vmin
+    var isImage = /^(data:image|https?:|\.{0,2}\/)/.test(pic) || /\.(png|jpe?g|gif|webp|svg)$/i.test(pic);
     var out = "";
     for (var i = 0; i < count; i++) {
-      out += '<span class="item" style="font-size:' + size + 'vmin">' + emoji + "</span>";
+      out += isImage
+        ? '<img class="item photo" alt="" src="' + pic + '" style="width:' + size + 'vmin;height:' + size + 'vmin">'
+        : '<span class="item" style="font-size:' + size + 'vmin">' + pic + "</span>";
     }
     return out;
   }
@@ -559,7 +566,7 @@
     show({
       seed: ch,
       glyph: ch,
-      art: emojiItems(entry[1], 1),
+      art: pictureItems(entry[1], 1),
       word: line,
       speech: line + "!"
     });
@@ -571,7 +578,7 @@
     var count = parseInt(d, 10);
     var artHtml = count === 0
       ? '<span class="item" style="font-size:30vmin;opacity:.35">🫧</span>'
-      : emojiItems(entry[1], count);
+      : pictureItems(entry[1], count);
     show({
       seed: "n" + d,
       glyph: d,
