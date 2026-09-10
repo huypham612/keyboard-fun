@@ -153,6 +153,8 @@
   }
   #art .item { font-size: 32vmin; }
   #art .photo { border-radius: 50%; object-fit: cover; }
+  #art .drawing { display: inline-flex; align-items: center; justify-content: center; }
+  #art .drawing svg { width: 100%; height: 100%; }
 
   #word {
     font-size: clamp(1.8rem, 10vmin, 7rem);
@@ -362,6 +364,28 @@
   var VOICE_RATE  = 0.9;   // 1 is normal speed
   var VOICE_PITCH = 1.1;   // 1 is normal, higher is brighter
 
+  // There is no xylophone emoji, which is why X was an x-ray for so long.
+  // Drawn here instead, and left readable so the colours can be changed.
+  var XYLOPHONE =
+    '<svg viewBox="0 0 120 86" aria-hidden="true">' +
+      '<rect x="8"     y="3"    width="11" height="70"   rx="3" fill="#e8453c"/>' +
+      '<rect x="21.5"  y="5.7"  width="11" height="64.6" rx="3" fill="#f78d1e"/>' +
+      '<rect x="35"    y="8.4"  width="11" height="59.2" rx="3" fill="#f7d117"/>' +
+      '<rect x="48.5"  y="11.1" width="11" height="53.8" rx="3" fill="#4caf50"/>' +
+      '<rect x="62"    y="13.8" width="11" height="48.4" rx="3" fill="#26c6da"/>' +
+      '<rect x="75.5"  y="16.5" width="11" height="43"   rx="3" fill="#2196f3"/>' +
+      '<rect x="89"    y="19.2" width="11" height="37.6" rx="3" fill="#7e57c2"/>' +
+      '<rect x="102.5" y="21.9" width="11" height="32.2" rx="3" fill="#ec407a"/>' +
+      '<rect x="7" y="26" width="107" height="3.5" rx="1.75" fill="rgba(0,0,0,0.38)"/>' +
+      '<rect x="7" y="46" width="107" height="3.5" rx="1.75" fill="rgba(0,0,0,0.38)"/>' +
+      '<g stroke="#a1887f" stroke-width="4.5" stroke-linecap="round">' +
+        '<line x1="16" y1="83" x2="54" y2="56"/>' +
+        '<line x1="34" y1="85" x2="72" y2="58"/>' +
+      '</g>' +
+      '<circle cx="56" cy="54" r="6.5" fill="#fffde7" stroke="#a1887f" stroke-width="2.5"/>' +
+      '<circle cx="74" cy="56" r="6.5" fill="#fffde7" stroke="#a1887f" stroke-width="2.5"/>' +
+    '</svg>';
+
   var LETTERS = {
     A: ["Apple", "🍎"],
     B: ["Ball", "⚽"],
@@ -386,7 +410,7 @@
     U: ["Umbrella", "☂️"],
     V: ["Violin", "🎻"],
     W: ["Watermelon", "🍉"],
-    X: ["X-ray", "🩻"],
+    X: ["Xylophone", XYLOPHONE],
     Y: ["Yo-yo", "🪀"],
     Z: ["Zebra", "🦓"]
   };
@@ -812,12 +836,19 @@
   function pictureItems(pic, count) {
     if (!pic || count < 1) return "";
     var size = count <= 1 ? 36 : count <= 3 ? 26 : count <= 6 ? 18 : 13;   // vmin
+    var isDrawing = /^\s*<svg/i.test(pic);
     var isImage = /^(data:image|https?:|\.{0,2}\/)/.test(pic) || /\.(png|jpe?g|gif|webp|svg)$/i.test(pic);
     var out = "";
     for (var i = 0; i < count; i++) {
-      out += isImage
-        ? '<img class="item photo" alt="" src="' + pic + '" style="width:' + size + 'vmin;height:' + size + 'vmin">'
-        : '<span class="item" style="font-size:' + size + 'vmin">' + pic + "</span>";
+      if (isDrawing) {
+        // Shown whole, not cropped to a circle: a photo of a face survives a
+        // round crop, a drawing of a wide object does not.
+        out += '<span class="item drawing" style="width:' + size + 'vmin;height:' + size + 'vmin">' + pic + "</span>";
+      } else if (isImage) {
+        out += '<img class="item photo" alt="" src="' + pic + '" style="width:' + size + 'vmin;height:' + size + 'vmin">';
+      } else {
+        out += '<span class="item" style="font-size:' + size + 'vmin">' + pic + "</span>";
+      }
     }
     return out;
   }

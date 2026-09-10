@@ -241,5 +241,10 @@ Swap in your child's own favorites (their name, the family pet, a food they
 like) and reload the page. Numbers take a third value, the plural noun the voice says:
 `"3": ["Three", "🎈", "balloons"]`.
 
-`X` is the awkward one. It currently says "X for X-ray" with 🩻, because there
-is no xylophone emoji. Change it if you'd rather.
+A picture is usually an emoji, but it can also be an image file, a `data:` URI,
+or **inline SVG** written straight into the entry. `X` uses the last of those:
+there is no xylophone emoji, so one is drawn in `XYLOPHONE` just above the
+letter list, and the colours there are easy to change.
+
+Photos get cropped to a circle; drawings are shown whole, since a face survives
+a round crop and a wide instrument does not.
