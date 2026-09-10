@@ -776,6 +776,7 @@
 
   var ENTRANCES = ["pop", "pop2", "pop3", "pop4"];
   var lastEntrance = "";
+  var greeted = false;
 
   // The letter and its picture land together, so they share one entrance -
   // two different ones at once reads as chaos rather than variety.
@@ -992,12 +993,17 @@
       }
     }
 
-    // Speaking once inside the click unlocks the voice in browsers that require a gesture.
+    // Speaking once inside the click unlocks the voice in browsers that require
+    // a gesture. Only greet the first time though: coming back from the start
+    // screen is not a new session, the voice is already unlocked, and presses
+    // are held while it talks - so repeating it just makes her wait every time
+    // she bounces out and back in with esc.
     if (soundOn && synth) {
       pickVoice();
-      // Kept short on purpose: presses are gated on the voice, so a long
-      // greeting would be a dead patch right when the keyboard gets grabbed.
-      say("Let's play!");
+      if (!greeted) {
+        greeted = true;
+        say("Let's play!");
+      }
     }
 
     gate.classList.add("gone");
