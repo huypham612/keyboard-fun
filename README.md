@@ -77,6 +77,14 @@ keeps Black and White visible.
   Clicking still works. Leaving full screen gives the pointer straight back.
   If the browser refuses the lock the toy still works, just with a visible
   cursor.
+* **Trackpad gestures the browser owns are blocked**: two-finger swipe (which
+  is back/forward, and on a `file://` page "back" leaves the toy), pinch to
+  zoom, scrolling and double-click zoom.
+* **Gestures macOS owns are not**, because the trackpad driver consumes them
+  before the browser sees anything. Turn these off in
+  *System Settings > Trackpad > More Gestures* if she finds them: swipe between
+  pages, swipe between full-screen apps, Mission Control, App Expose, Launchpad,
+  Show Desktop.
 * macOS keeps some keys for itself that **no web page can intercept**. If she
   finds them, turn them off in System Settings:
 

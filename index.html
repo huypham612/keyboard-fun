@@ -51,6 +51,10 @@
     height: 100%;
     margin: 0;
     overflow: hidden;
+    /* A two-finger swipe left/right is browser back/forward on macOS. On a
+       file:// page "back" leaves the toy entirely. This is what stops it. */
+    overscroll-behavior: none;
+    overscroll-behavior-x: none;
     background: var(--page);
     font-family: "Baloo 2", "Comic Sans MS", "Chalkboard SE", "Trebuchet MS", system-ui, sans-serif;
     -webkit-user-select: none;
@@ -892,9 +896,18 @@
     clickTurn++;
   });
 
-  // Stop the browser scrolling or zooming under small palms.
-  window.addEventListener("wheel", function (e) { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
+  // Stop the browser scrolling or zooming under small palms. Every wheel event
+  // goes, not just the pinch-zoom ones (ctrlKey): a two-finger scroll can still
+  // drive overscroll navigation even with nothing on the page to scroll.
+  window.addEventListener("wheel", function (e) { e.preventDefault(); }, { passive: false });
   window.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+  window.addEventListener("dblclick", function (e) { e.preventDefault(); });
+
+  // Safari/WebKit pinch and rotate on a trackpad arrive as gesture events
+  // rather than as wheel events, so they need blocking separately.
+  ["gesturestart", "gesturechange", "gestureend"].forEach(function (name) {
+    window.addEventListener(name, function (e) { e.preventDefault(); }, { passive: false });
+  });
 })();
 </script>
 </body>
