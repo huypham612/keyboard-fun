@@ -6,9 +6,43 @@
 <title>Keyboard Fun</title>
 <style>
   :root {
+    color-scheme: light dark;
     --bg1: #ffd6e8;
     --bg2: #c7f0ff;
     --ink: #2b2440;
+    --glyph: #ffffff;
+    --glyph-stroke: #2b2440;
+    --pill: rgba(255,255,255,0.72);
+    --disc-stroke: rgba(43,36,64,0.3);
+    --hint-bg: rgba(255,255,255,0.42);
+    --hint-ink: rgba(43,36,64,0.62);
+    --hint-strong: rgba(43,36,64,0.9);
+    --gate-bg: linear-gradient(150deg, #ffe6a7, #ffc2e2 45%, #b8e6ff);
+    --gate-sub: rgba(43,36,64,0.7);
+    --shadow: rgba(0,0,0,0.22);
+    --page: #111111;
+  }
+
+  /* Follows the system setting, so evening play is not a wall of light.
+     Backgrounds stay dim rather than black: pure black under a white glyph
+     is harsher on the eye than a muted one. */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg1: #2a2440;
+      --bg2: #1f2c3d;
+      --ink: #e9e5f4;
+      --glyph: #f6f2ff;
+      --glyph-stroke: #0e0c16;
+      --pill: rgba(18,16,26,0.74);
+      --disc-stroke: rgba(255,255,255,0.45);
+      --hint-bg: rgba(10,9,16,0.5);
+      --hint-ink: rgba(233,229,244,0.6);
+      --hint-strong: rgba(233,229,244,0.92);
+      --gate-bg: linear-gradient(150deg, #322a44, #3a2a3c 45%, #1f2c3d);
+      --gate-sub: rgba(233,229,244,0.68);
+      --shadow: rgba(0,0,0,0.5);
+      --page: #0b0a10;
+    }
   }
 
   * { box-sizing: border-box; }
@@ -17,7 +51,7 @@
     height: 100%;
     margin: 0;
     overflow: hidden;
-    background: #111;
+    background: var(--page);
     font-family: "Baloo 2", "Comic Sans MS", "Chalkboard SE", "Trebuchet MS", system-ui, sans-serif;
     -webkit-user-select: none;
     user-select: none;
@@ -94,12 +128,11 @@
     font-size: clamp(5rem, 46vmin, 32rem);
     font-weight: 900;
     line-height: 0.9;
-    color: #fff;
+    color: var(--glyph);
     text-shadow:
-      0 0 0 #000,
       6px 6px 0 rgba(0,0,0,0.16),
-      0 1.4vmin 3vmin rgba(0,0,0,0.22);
-    -webkit-text-stroke: 1.1vmin var(--ink);
+      0 1.4vmin 3vmin var(--shadow);
+    -webkit-text-stroke: 1.1vmin var(--glyph-stroke);
     paint-order: stroke fill;
   }
   #glyph:empty { display: none; }
@@ -112,7 +145,7 @@
     gap: 1.2vmin;
     max-width: 52vw;
     line-height: 1;
-    filter: drop-shadow(0 1.2vmin 2vmin rgba(0,0,0,0.25));
+    filter: drop-shadow(0 1.2vmin 2vmin var(--shadow));
   }
   #art .item { font-size: 32vmin; }
   #art .photo { border-radius: 50%; object-fit: cover; }
@@ -121,10 +154,10 @@
     font-size: clamp(1.8rem, 10vmin, 7rem);
     font-weight: 900;
     color: var(--ink);
-    background: rgba(255,255,255,0.72);
+    background: var(--pill);
     padding: 1vmin 4vmin;
     border-radius: 999px;
-    box-shadow: 0 1vmin 2.4vmin rgba(0,0,0,0.14);
+    box-shadow: 0 1vmin 2.4vmin var(--shadow);
     letter-spacing: 0.01em;
     text-align: center;
     max-width: 92vw;
@@ -160,6 +193,7 @@
   /* ---------- shapes ---------- */
 
   #art svg { width: 52vmin; height: 52vmin; max-width: 62vw; }
+  #art .disc { stroke: var(--disc-stroke); stroke-width: 1.6; }
 
   /* ---------- hint bar ---------- */
 
@@ -172,14 +206,14 @@
     text-align: center;
     font-size: clamp(0.7rem, 1.7vmin, 1.05rem);
     font-weight: 700;
-    color: rgba(43,36,64,0.62);
-    background: rgba(255,255,255,0.42);
+    color: var(--hint-ink);
+    background: var(--hint-bg);
     backdrop-filter: blur(6px);
     transition: opacity 700ms ease;
     z-index: 10;
   }
   #hint.hide { opacity: 0; }
-  #hint b { color: rgba(43,36,64,0.9); }
+  #hint b { color: var(--hint-strong); }
 
   /* ---------- start overlay ---------- */
 
@@ -192,7 +226,7 @@
     align-items: center;
     justify-content: center;
     gap: 3vmin;
-    background: linear-gradient(150deg, #ffe6a7, #ffc2e2 45%, #b8e6ff);
+    background: var(--gate-bg);
     text-align: center;
     padding: 5vmin;
   }
@@ -208,7 +242,7 @@
     max-width: 46rem;
     font-size: clamp(0.9rem, 2.4vmin, 1.4rem);
     font-weight: 700;
-    color: rgba(43,36,64,0.7);
+    color: var(--gate-sub);
     line-height: 1.6;
   }
   #play {
@@ -234,7 +268,7 @@
     align-items: center;
     font-size: clamp(0.8rem, 2vmin, 1.15rem);
     font-weight: 700;
-    color: rgba(43,36,64,0.66);
+    color: var(--gate-sub);
   }
   #gate label { display: flex; align-items: center; gap: 0.8vmin; cursor: pointer; }
   #gate input { width: 2.2vmin; height: 2.2vmin; min-width: 16px; min-height: 16px; accent-color: #ff5fa2; }
@@ -336,19 +370,19 @@
     "9": ["Nine", "🐝", "bees"]
   };
 
-  // [name, the disc, the soft background behind it]
+  // [name, the disc, the backdrop in light, the backdrop in dark]
   var COLORS = [
-    ["Red",    "#ff3b30", "#ffd9d6"],
-    ["Orange", "#ff8c1a", "#ffe6cc"],
-    ["Yellow", "#fcc419", "#fff3cf"],
-    ["Green",  "#2f9e44", "#d6f2de"],
-    ["Blue",   "#1c7ed6", "#d2e7ff"],
-    ["Purple", "#9333ea", "#ecd9ff"],
-    ["Pink",   "#ff5fa2", "#ffd9ea"],
-    ["Brown",  "#8b5a2b", "#ecdcc9"],
-    ["Gray",   "#8d949e", "#e6e8eb"],
-    ["Black",  "#1b1b1f", "#d8d9dd"],
-    ["White",  "#ffffff", "#c9d2de"]
+    ["Red",    "#ff3b30", "#ffd9d6", "#3a1e1b"],
+    ["Orange", "#ff8c1a", "#ffe6cc", "#3a2a14"],
+    ["Yellow", "#fcc419", "#fff3cf", "#3a3316"],
+    ["Green",  "#2f9e44", "#d6f2de", "#1b3421"],
+    ["Blue",   "#1c7ed6", "#d2e7ff", "#16273a"],
+    ["Purple", "#9333ea", "#ecd9ff", "#2a1b3a"],
+    ["Pink",   "#ff5fa2", "#ffd9ea", "#3a1e2c"],
+    ["Brown",  "#8b5a2b", "#ecdcc9", "#2e2317"],
+    ["Gray",   "#8d949e", "#e6e8eb", "#262a2f"],
+    ["Black",  "#1b1b1f", "#d8d9dd", "#2c2c31"],
+    ["White",  "#ffffff", "#c9d2de", "#2a2e35"]
   ];
 
   var SHAPES = [
@@ -374,6 +408,15 @@
     ["#ffe8c2", "#ffc9de"], ["#cdf0ea", "#f9f6c5"], ["#ffd6e0", "#c1e1ff"],
     ["#e5f8c8", "#bde0fe"], ["#ffe5d0", "#d5c6ff"], ["#c9f2ff", "#ffe6f7"],
     ["#f6e3ff", "#d0f4de"]
+  ];
+
+  // Same hue families, dimmed for night. Same length and order as SKIES, so a
+  // letter keeps its identity across a theme change.
+  var SKIES_DARK = [
+    ["#3a2331", "#3a2c1e"], ["#1e3327", "#1c3038"], ["#2b2444", "#1e2c40"],
+    ["#3a2f1f", "#3a2331"], ["#1d332f", "#33321c"], ["#3a2330", "#1e2a40"],
+    ["#27331d", "#1e2b40"], ["#3a2c22", "#2b2444"], ["#1d3038", "#3a2537"],
+    ["#2f2444", "#1d3328"]
   ];
 
   var CONFETTI_COLORS = ["#ff5fa2", "#ffc93c", "#4dabf7", "#69db7c", "#b197fc", "#ff922b"];
@@ -521,10 +564,31 @@
     return Math.abs(h);
   }
 
+  var darkQuery = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+  function isDark() { return !!(darkQuery && darkQuery.matches); }
+
+  // Backgrounds are set inline, which beats the stylesheet's media query, so
+  // the current one has to be repainted by hand when the system theme flips.
+  var repaint = null;
+
   function setSky(seed) {
-    var pair = SKIES[hashOf(seed) % SKIES.length];
+    repaint = function () { setSky(seed); };
+    var list = isDark() ? SKIES_DARK : SKIES;
+    var pair = list[hashOf(seed) % list.length];
     app.style.setProperty("--bg1", pair[0]);
     app.style.setProperty("--bg2", pair[1]);
+  }
+
+  function paintColor(entry) {
+    repaint = function () { paintColor(entry); };
+    app.style.setProperty("--bg1", isDark() ? entry[3] : entry[2]);
+    app.style.setProperty("--bg2", isDark() ? "#15131c" : "#ffffff");
+  }
+
+  if (darkQuery) {
+    var onScheme = function () { if (repaint) repaint(); };
+    if (darkQuery.addEventListener) darkQuery.addEventListener("change", onScheme);
+    else if (darkQuery.addListener) darkQuery.addListener(onScheme);   // older Safari
   }
 
   function confetti() {
@@ -631,16 +695,15 @@
     if (colorSeen) colorIndex = (colorIndex + step + COLORS.length) % COLORS.length;
     else colorSeen = true;
     var entry = COLORS[colorIndex];
-    var name = entry[0], solid = entry[1], soft = entry[2];
-    app.style.setProperty("--bg1", soft);
-    app.style.setProperty("--bg2", "#ffffff");
+    var name = entry[0], solid = entry[1];
+    paintColor(entry);
 
     idle.style.display = "none";
     stage.classList.add("on");
     glyph.textContent = "";
     art.innerHTML =
-      '<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="' + solid +
-      '" stroke="rgba(43,36,64,0.3)" stroke-width="1.6"/></svg>';   // the outline is what makes White show up
+      '<svg viewBox="0 0 100 100" aria-hidden="true"><circle class="disc" cx="50" cy="50" r="44" fill="' +
+      solid + '"/></svg>';   // .disc carries a themed outline, or white and black vanish
     word.textContent = name;
 
     replay(art, "pop");

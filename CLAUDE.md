@@ -48,6 +48,22 @@ Please don't "simplify" these away without reading why.
 * **Test in Firefox, not only Chrome.** They differ on Keyboard Lock, on
   which keys have browser-level meaning, and on speech voices.
 
+## Theming
+
+Colours live in CSS custom properties on `:root`, with a
+`@media (prefers-color-scheme: dark)` block redefining them. **Never give a
+colour its only definition inside the dark block.**
+
+The catch: `SKIES` and the colour backdrops are applied as *inline* styles from
+JS, which beat the stylesheet, so they cannot be themed by CSS alone. They have
+parallel dark values (`SKIES_DARK`, and a 4th entry per colour) chosen by
+`isDark()`, and a `matchMedia` listener repaints the current view when the
+system flips. If you add anything else that sets a colour from JS, it needs the
+same treatment or it will stay light at night.
+
+The colour disc's outline is `--disc-stroke` and must invert with the theme, or
+the Black disc vanishes on a dark ground and the White one on a light ground.
+
 ## Editing content
 
 Everything a parent would change sits in one block at the top of the `<script>`

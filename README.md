@@ -35,6 +35,18 @@ diamond, moon, pentagon, hexagon, octagon, arrow, cross.
 
 Press `esc` to leave full screen.
 
+## Light and dark
+
+The theme follows the system setting automatically, and switches live if macOS
+flips at sunset - no reload, no setting in the app. Evening play is dim rather
+than a wall of white light.
+
+Dark backgrounds are muted rather than black, since a white letter on pure
+black is harsher on the eye than on a soft dark ground. Each letter keeps its
+own background hue across the switch, so the colour cue it is learned by
+survives. The colour discs gain a light outline in dark mode, which is what
+keeps Black and White visible.
+
 ## Notes for the grown-up
 
 * Holding a key down fires once, not fifty times, and presses that arrive
