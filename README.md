@@ -45,7 +45,7 @@ well as an alphabet. Letters walk up the scale, and numbers, colours and shapes
 each start from a different point so they don't sound alike.
 
 The scale is **pentatonic**, which means no two notes can clash however many
-she hits at once. Knobs at the top of the `<script>` tag:
+get hit at once. Knobs at the top of the `<script>` tag:
 
 ```js
 var MUSIC       = true;  // set false for speech only
@@ -62,7 +62,7 @@ to wait for and the voice starts immediately.
 
 Don't push `VOICE_GAP` far past 200ms. Beyond that the chime and the word stop
 sounding like one event and just feel slow, and because nothing else can happen
-until the sentence ends, every extra millisecond is another millisecond of her
+until the sentence ends, every extra millisecond is another millisecond of
 presses being ignored.
 
 If it still feels busy, lower `NOTE_VOLUME` first, then `NOTE_DECAY`. The notes are plain sine waves and stop at G5 on purpose: the
@@ -113,7 +113,7 @@ keeps Black and White visible.
   screen.
 * **In Chrome or Edge, full screen additionally takes a keyboard lock**, which
   catches modifier shortcuts too (`Cmd+W`, `Cmd+R`). **Firefox has no such API**,
-  so there `Cmd+W` still closes the tab. If she keeps finding those, play in
+  so there `Cmd+W` still closes the tab. If those keep getting found, play in
   Chrome:
 
   ```
@@ -130,13 +130,13 @@ keeps Black and White visible.
   zoom, scrolling and double-click zoom.
 * **Gestures macOS owns are not**, because the trackpad driver consumes them
   before the browser sees anything. Turn these off in
-  *System Settings > Trackpad > More Gestures* if she finds them: swipe between
+  *System Settings > Trackpad > More Gestures* if they get found: swipe between
   pages, swipe between full-screen apps, Mission Control, App Expose, Launchpad,
   Show Desktop.
-* macOS keeps some keys for itself that **no web page can intercept**. If she
-  finds them, turn them off in System Settings:
+* macOS keeps some keys for itself that **no web page can intercept**. If they
+  get found, turn them off in System Settings:
 
-  | What she hits | Turn it off in |
+  | The key | Turn it off in |
   | --- | --- |
   | Spotlight (`Cmd+Space`) | Keyboard > Keyboard Shortcuts > Spotlight |
   | Mission Control / Launchpad (`F3`, `F4`) | Keyboard > Keyboard Shortcuts > Mission Control |

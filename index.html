@@ -181,7 +181,7 @@
   }
 
   /* Alternative entrances. Same 520ms envelope as .pop on purpose: pacing is
-     tied to the voice finishing, so a slower landing would make her wait to
+     tied to the voice finishing, so a slower landing would mean waiting to
      see the picture. Picked at random per press, purely for freshness - the
      recognition cue is the background colour, which stays deterministic. */
   .pop2 { animation: pop2 520ms cubic-bezier(.2,1.4,.5,1) both; }
@@ -245,7 +245,7 @@
     align-items: center; justify-content: center;
   }
   body.touch #stage { height: auto; flex: 1 1 auto; min-height: 0; padding: 2vmin; }
-  body.touch #hint { display: none; }        /* it describes keys she hasn't got */
+  body.touch #hint { display: none; }        /* it describes keys that aren't there */
 
   body.touch #pad {
     display: grid;
@@ -575,7 +575,7 @@
      VOICE
      ===================================================================== */
 
-  // C major pentatonic. The scale choice is the whole trick: she mashes, and
+  // C major pentatonic. The scale choice is the whole trick: keys get mashed, and
   // on a major scale mashed clusters are dissonant and grate within a day.
   // On a pentatonic there are no wrong combinations - every simultaneous
   // press sounds intentional.
@@ -881,7 +881,7 @@
 
     setSky(opts.seed);
     entrance([glyph, art]);
-    replay(word, "popSoft");   // the pill she reads keeps one steady entrance
+    replay(word, "popSoft");   // the pill being read keeps one steady entrance
     confetti();
     say(opts.speech);
   }
@@ -1132,8 +1132,8 @@
     // Speaking once inside the click unlocks the voice in browsers that require
     // a gesture. Only greet the first time though: coming back from the start
     // screen is not a new session, the voice is already unlocked, and presses
-    // are held while it talks - so repeating it just makes her wait every time
-    // she bounces out and back in with esc.
+    // are held while it talks - so repeating it just adds a wait every time
+    // someone bounces out and back in with esc.
     if (soundOn && synth) {
       pickVoice();
       if (!greeted) {

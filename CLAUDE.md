@@ -58,12 +58,13 @@ Please don't "simplify" these away without reading why.
   regression here shipped once: `'` and `/` reached Firefox and opened Quick
   Find because swallowing was gated on the lock.
 * **Every entrance animation is 520ms.** `.pop`, `.pop2`, `.pop3`, `.pop4` are
-  picked at random per press for freshness, but a slower one would make her
-  wait to see the picture, because pacing is already gated on the voice. Add
+  picked at random per press for freshness, but a slower one would mean waiting
+  to see the picture, because pacing is already gated on the voice. Add
   variants freely; keep the envelope. New ones must also join the
   `prefers-reduced-motion` rule and the `ENTRANCES` list.
-* **The note scale is pentatonic, and that is the whole point.** She mashes.
-  On a major scale simultaneous presses are dissonant and grate within a day;
+* **The note scale is pentatonic, and that is the whole point.** Keys get
+  mashed. On a major scale simultaneous presses are dissonant and grate within
+  a day;
   on a pentatonic there are no wrong combinations. Do not "complete" `SCALE`
   into a full major scale. Letters, numbers, colours and shapes all draw from
   the same array (with small offsets so the types sound different), so nothing
