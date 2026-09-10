@@ -49,8 +49,8 @@ get hit at once. Knobs at the top of the `<script>` tag:
 
 ```js
 var MUSIC       = true;  // set false for speech only
-var NOTE_VOLUME = 0.34;  // it has its own slot, so it can be present
-var NOTE_BRIGHT = 0.38;  // upper harmonics; 0 is a plain sine, 1 is clangy
+var NOTE_VOLUME = 0.28;  // present, but the most repeated sound here
+var NOTE_BRIGHT = 0.26;  // upper harmonics; 0 is a plain sine, 1 is clangy
 var NOTE_DECAY  = 0.22;  // seconds; short enough to finish before the word
 var VOICE_GAP   = 140;   // ms of silence between the note ending and the word
 ```

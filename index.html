@@ -424,8 +424,11 @@
   var WAIT_FOR_VOICE = true;  // and also wait until the whole phrase has been said
   var VOICE_TIMEOUT = 4000;   // safety net if a browser never reports the end
   var MUSIC       = true;  // a soft note under each press, so mashing makes a tune
-  var NOTE_VOLUME = 0.34;  // it has its own slot now, so it can be present
-  var NOTE_BRIGHT = 0.38;  // upper harmonics; 0 is a plain sine, 1 is clangy
+  var NOTE_VOLUME = 0.28;  // present, but the most repeated sound here
+  var NOTE_BRIGHT = 0.26;  // upper harmonics; 0 is a plain sine, 1 is clangy
+                           // Kept low deliberately: this note repeats on every
+                           // single press, and bright sounds wear thin far
+                           // faster than warm ones. Raise level before bright.
   var NOTE_DECAY  = 0.22;  // seconds; short enough to be done before the word
   var VOICE_GAP   = 140;   // ms of silence between the note ending and the word
   var VOICE_RATE  = 0.9;   // 1 is normal speed
