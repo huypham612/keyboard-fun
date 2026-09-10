@@ -356,7 +356,8 @@
   var WAIT_FOR_VOICE = true;  // and also wait until the whole phrase has been said
   var VOICE_TIMEOUT = 4000;   // safety net if a browser never reports the end
   var MUSIC       = true;  // a soft note under each press, so mashing makes a tune
-  var NOTE_VOLUME = 0.16;  // kept well under the voice
+  var NOTE_VOLUME = 0.09;  // kept well under the voice
+  var NOTE_DECAY  = 0.22;  // seconds; short enough to be done before the word
   var VOICE_RATE  = 0.9;   // 1 is normal speed
   var VOICE_PITCH = 1.1;   // 1 is normal, higher is brighter
 
@@ -497,9 +498,11 @@
   // on a major scale mashed clusters are dissonant and grate within a day.
   // On a pentatonic there are no wrong combinations - every simultaneous
   // press sounds intentional.
+  // Nine notes, C4 up to G5. Deliberately narrow: the octave above this is
+  // where a bright note starts to cut through the voice rather than sit under
+  // it. Letters wrap round the nine rather than climbing into that register.
   var SCALE = [261.63, 293.66, 329.63, 392.00, 440.00,
-               523.25, 587.33, 659.25, 783.99, 880.00,
-               1046.50, 1174.66, 1318.51];
+               523.25, 587.33, 659.25, 783.99];
 
   var audio = null;
 
@@ -521,19 +524,19 @@
     var osc = audio.createOscillator();
     var gain = audio.createGain();
 
-    osc.type = "triangle";               // softer than square, warmer than sine
+    osc.type = "sine";                   // fewest harmonics, so it stays out of the way
     osc.frequency.value = f;
 
     // Struck-and-decaying, like a small marimba, so it never drones under
     // the spoken word. exponentialRamp needs a non-zero target.
     gain.gain.setValueAtTime(0.0001, t);
     gain.gain.exponentialRampToValueAtTime(NOTE_VOLUME, t + 0.012);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + NOTE_DECAY);
 
     osc.connect(gain);
     gain.connect(audio.destination);
     osc.start(t);
-    osc.stop(t + 0.5);
+    osc.stop(t + NOTE_DECAY + 0.05);
   }
 
   var synth = window.speechSynthesis || null;

@@ -49,8 +49,14 @@ she hits at once. Knobs at the top of the `<script>` tag:
 
 ```js
 var MUSIC       = true;  // set false for speech only
-var NOTE_VOLUME = 0.16;  // kept well under the voice
+var NOTE_VOLUME = 0.09;  // kept well under the voice
+var NOTE_DECAY  = 0.22;  // seconds; short enough to finish before the word
 ```
+
+If it feels busy against the voice, lower `NOTE_VOLUME` first, then
+`NOTE_DECAY`. The notes are plain sine waves and stop at G5 on purpose: the
+octave above that is where a note starts cutting through speech rather than
+sitting under it.
 
 The **Sound** checkbox on the start screen governs the notes and the voice
 together, so unchecking it gives full silence.
