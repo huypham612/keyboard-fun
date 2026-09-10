@@ -424,7 +424,8 @@
   var WAIT_FOR_VOICE = true;  // and also wait until the whole phrase has been said
   var VOICE_TIMEOUT = 4000;   // safety net if a browser never reports the end
   var MUSIC       = true;  // a soft note under each press, so mashing makes a tune
-  var NOTE_VOLUME = 0.20;  // it has its own slot now, so it can be present
+  var NOTE_VOLUME = 0.34;  // it has its own slot now, so it can be present
+  var NOTE_BRIGHT = 0.38;  // upper harmonics; 0 is a plain sine, 1 is clangy
   var NOTE_DECAY  = 0.22;  // seconds; short enough to be done before the word
   var VOICE_GAP   = 140;   // ms of silence between the note ending and the word
   var VOICE_RATE  = 0.9;   // 1 is normal speed
@@ -630,11 +631,12 @@
 
     tone(f, NOTE_VOLUME, NOTE_DECAY, t);
 
-    // A quiet octave on top, dying away much faster than the fundamental.
-    // That brief sparkle is what makes it read as struck, like a small
-    // marimba, rather than as a flat beep. It is gone long before the word
-    // starts, so it costs nothing in busyness.
-    tone(f * 2, NOTE_VOLUME * 0.25, NOTE_DECAY * 0.4, t);
+    // Harmonics above the fundamental, each dying faster than the one below.
+    // A plain sine is the least present timbre there is, so this is what lets
+    // the note carry against a voice at full volume without simply being
+    // louder. Both are gone well before the word starts.
+    tone(f * 2, NOTE_VOLUME * NOTE_BRIGHT, NOTE_DECAY * 0.55, t);
+    tone(f * 3, NOTE_VOLUME * NOTE_BRIGHT * 0.3, NOTE_DECAY * 0.25, t);
   }
 
   var synth = window.speechSynthesis || null;
