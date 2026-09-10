@@ -23,6 +23,13 @@ Please don't "simplify" these away without reading why.
   (Enhanced) but is one voice change from saying "uh apple", which is the bug
   this whole area exists to prevent. Do not tidy the ellipsis into a space or
   a comma.
+* **Numbers use a full stop and that is correct, not an oversight.** After a
+  whole word ("Five.") a full stop already produces the entire pause; after a
+  single letter ("A.") the engine reads it as an initial and gives none, which
+  is exactly why letters need the dots. Measured: `Five...` vs `Five.` differs
+  by 0ms, `A...` vs `A.` by 302ms. So do not "align" numbers to the ellipsis -
+  it changes nothing audible - and do not simplify letters down to a full stop,
+  which silently removes their pause.
 * **The pill shows the word alone**, not the letter too - the letter is
   already on screen at 46vmin beside it.
 * **Pacing waits for the voice to finish**, with `PRESS_DELAY` only as a floor.
