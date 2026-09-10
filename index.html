@@ -676,12 +676,15 @@
       return;
     }
 
-    // While the keyboard is locked every other key belongs to us, so swallow
-    // the lot: an unmapped key should do nothing rather than reach the browser.
-    if (locked) {
-      e.preventDefault();
-    } else if (key === " " || e.code === "Space" || key.indexOf("Arrow") === 0) {
-      // Not locked: these still scroll the page, so stop that much at least.
+    // Every plain key belongs to the child, so swallow the lot whether or not
+    // the keyboard lock was granted. An unmapped key must do nothing rather
+    // than reach the browser: in Firefox "'" and "/" open Quick Find, space
+    // and the arrows scroll, F5 reloads. Do not rely on the lock for this -
+    // Firefox has no Keyboard Lock API at all, so it is never granted there.
+    //
+    // Combos are left alone unless the lock was granted, so an adult keeps
+    // Cmd+R and friends while playing windowed.
+    if (locked || !(e.metaKey || e.ctrlKey || e.altKey)) {
       e.preventDefault();
     }
 

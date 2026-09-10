@@ -44,10 +44,18 @@ Press `esc` to leave full screen.
   shortcuts still work.
 * Each letter always gets the same background colors, giving a second cue to
   recognize it by.
-* In full screen the app takes a **keyboard lock**, so browser shortcuts
-  (`Cmd+W`, `Cmd+R`, `F5`) and every unmapped key do nothing. **Hold `esc`** to
-  get out. Chrome and Edge support this; on Safari and Firefox the shortcuts
-  keep working and the toy behaves normally otherwise.
+* **Every key without a modifier is swallowed** in all browsers, so unmapped
+  keys do nothing rather than reaching the browser. That covers `'` and `/`
+  (Quick Find in Firefox), `F5`, `Tab` and the rest. Press `esc` to leave full
+  screen.
+* **In Chrome or Edge, full screen additionally takes a keyboard lock**, which
+  catches modifier shortcuts too (`Cmd+W`, `Cmd+R`). **Firefox has no such API**,
+  so there `Cmd+W` still closes the tab. If she keeps finding those, play in
+  Chrome:
+
+  ```
+  open -a "Google Chrome" index.html
+  ```
 * The mouse pointer is hidden while playing, and only clicks do anything -
   moving the pointer around has no effect in the page.
 * macOS keeps some keys for itself that **no web page can intercept**. If she

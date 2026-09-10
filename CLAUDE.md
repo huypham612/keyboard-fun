@@ -39,9 +39,14 @@ Please don't "simplify" these away without reading why.
   Holding it is the only way out of full screen once the lock is held.
   Swallowing it traps the user. Do not "tidy" this into the blanket
   `preventDefault`.
-* **Keyboard Lock is best-effort.** If it is denied, or the browser lacks the
-  API, the toy must still work and shortcuts must keep reaching the browser.
-  Never assume the lock succeeded.
+* **Keyboard Lock is best-effort and must never be relied on.** Firefox has
+  no Keyboard Lock API at all, and it only works in full screen even where it
+  exists. Swallowing unmapped keys is done unconditionally for every key
+  without a modifier, precisely so behaviour does not depend on the lock. A
+  regression here shipped once: `'` and `/` reached Firefox and opened Quick
+  Find because swallowing was gated on the lock.
+* **Test in Firefox, not only Chrome.** They differ on Keyboard Lock, on
+  which keys have browser-level meaning, and on speech voices.
 
 ## Editing content
 
