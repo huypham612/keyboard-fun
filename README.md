@@ -49,7 +49,7 @@ she hits at once. Knobs at the top of the `<script>` tag:
 
 ```js
 var MUSIC       = true;  // set false for speech only
-var NOTE_VOLUME = 0.09;  // kept well under the voice
+var NOTE_VOLUME = 0.20;  // it has its own slot, so it can be present
 var NOTE_DECAY  = 0.22;  // seconds; short enough to finish before the word
 ```
 

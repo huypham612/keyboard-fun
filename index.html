@@ -356,7 +356,7 @@
   var WAIT_FOR_VOICE = true;  // and also wait until the whole phrase has been said
   var VOICE_TIMEOUT = 4000;   // safety net if a browser never reports the end
   var MUSIC       = true;  // a soft note under each press, so mashing makes a tune
-  var NOTE_VOLUME = 0.09;  // kept well under the voice
+  var NOTE_VOLUME = 0.20;  // it has its own slot now, so it can be present
   var NOTE_DECAY  = 0.22;  // seconds; short enough to be done before the word
   var VOICE_RATE  = 0.9;   // 1 is normal speed
   var VOICE_PITCH = 1.1;   // 1 is normal, higher is brighter
@@ -515,28 +515,35 @@
     try { audio = new AC(); } catch (e) { audio = null; }
   }
 
+  // One struck-and-decaying sine. exponentialRamp needs a non-zero target.
+  function tone(f, vol, decay, t) {
+    var osc = audio.createOscillator();
+    var gain = audio.createGain();
+    osc.type = "sine";                   // fewest harmonics, so it stays clean
+    osc.frequency.value = f;
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(vol, t + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + decay);
+    osc.connect(gain);
+    gain.connect(audio.destination);
+    osc.start(t);
+    osc.stop(t + decay + 0.05);
+  }
+
   function note(i) {
     if (!MUSIC || !soundOn || !audio) return;
     if (audio.state === "suspended") { try { audio.resume(); } catch (e) { /* fine */ } }
 
     var f = SCALE[((i % SCALE.length) + SCALE.length) % SCALE.length];
     var t = audio.currentTime;
-    var osc = audio.createOscillator();
-    var gain = audio.createGain();
 
-    osc.type = "sine";                   // fewest harmonics, so it stays out of the way
-    osc.frequency.value = f;
+    tone(f, NOTE_VOLUME, NOTE_DECAY, t);
 
-    // Struck-and-decaying, like a small marimba, so it never drones under
-    // the spoken word. exponentialRamp needs a non-zero target.
-    gain.gain.setValueAtTime(0.0001, t);
-    gain.gain.exponentialRampToValueAtTime(NOTE_VOLUME, t + 0.012);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t + NOTE_DECAY);
-
-    osc.connect(gain);
-    gain.connect(audio.destination);
-    osc.start(t);
-    osc.stop(t + NOTE_DECAY + 0.05);
+    // A quiet octave on top, dying away much faster than the fundamental.
+    // That brief sparkle is what makes it read as struck, like a small
+    // marimba, rather than as a flat beep. It is gone long before the word
+    // starts, so it costs nothing in busyness.
+    tone(f * 2, NOTE_VOLUME * 0.25, NOTE_DECAY * 0.4, t);
   }
 
   var synth = window.speechSynthesis || null;
