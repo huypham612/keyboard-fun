@@ -298,7 +298,7 @@
 </div>
 
 <div id="hint">
-  <b>A–Z</b> letters &nbsp;·&nbsp; <b>0–9</b> numbers &nbsp;·&nbsp; <b>↑ →</b> next color &nbsp;·&nbsp; <b>↓ ←</b> color back &nbsp;·&nbsp; <b>space</b> shapes &nbsp;·&nbsp; <b>click</b> both &nbsp;·&nbsp; <b>hold esc</b> exits
+  <b>A–Z</b> letters &nbsp;·&nbsp; <b>0–9</b> numbers &nbsp;·&nbsp; <b>↑ →</b> next color &nbsp;·&nbsp; <b>↓ ←</b> color back &nbsp;·&nbsp; <b>space</b> shapes &nbsp;·&nbsp; <b>click</b> both &nbsp;·&nbsp; <b>esc</b> back to start
 </div>
 
 <div id="gate">
@@ -517,6 +517,33 @@
     /* nothing to do: the toy works fine with a visible pointer */
   });
 
+  // Back to the start screen. Leaving full screen drops the keyboard and
+  // pointer locks, so carrying on in a window would be the one unprotected
+  // way to play. Make the only route back through "Let's play!".
+  function goHome() {
+    if (!gate.classList.contains("gone")) return;    // already home
+
+    gate.classList.remove("gone");
+    stage.classList.remove("on");
+    idle.style.display = "";
+    glyph.textContent = "";
+    art.innerHTML = "";
+    word.textContent = "";
+
+    // Drop back to the stylesheet's themed default rather than the last
+    // letter's background.
+    app.style.removeProperty("--bg1");
+    app.style.removeProperty("--bg2");
+    repaint = null;
+
+    clearTimeout(speakTimer);
+    clearTimeout(unlockTimer);
+    speaking = false;
+    if (synth) { try { synth.cancel(); } catch (e) { /* idle */ } }
+
+    hint.classList.add("hide");
+  }
+
   function unlockKeys() {
     locked = false;
     if (navigator.keyboard && navigator.keyboard.unlock) {
@@ -533,6 +560,7 @@
       app.classList.remove("playing");
       unlockKeys();
       unlockPointer();
+      goHome();          // however full screen ended, do not carry on windowed
     }
   });
 
@@ -758,7 +786,11 @@
     // as a frozen toy. Never preventDefault it: the browser's own
     // hold-to-exit stays as a backstop if this ever fails.
     if (key === "Escape") {
-      if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
+      if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen();     // fullscreenchange then calls goHome
+      } else {
+        goHome();                      // already windowed; go home directly
+      }
       return;
     }
 

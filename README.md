@@ -33,7 +33,10 @@ and round.
 Fourteen shapes: circle, square, triangle, rectangle, star, heart, oval,
 diamond, moon, pentagon, hexagon, octagon, arrow, cross.
 
-Press `esc` to leave full screen.
+Press `esc` to go back to the start screen. Leaving full screen always returns
+there, however it happened, so the toy is never left running in a window where
+the keyboard and pointer locks do not apply. Getting back in means clicking
+**Let's play!** again.
 
 ## Light and dark
 
