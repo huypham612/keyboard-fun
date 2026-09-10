@@ -358,6 +358,7 @@
   var MUSIC       = true;  // a soft note under each press, so mashing makes a tune
   var NOTE_VOLUME = 0.20;  // it has its own slot now, so it can be present
   var NOTE_DECAY  = 0.22;  // seconds; short enough to be done before the word
+  var VOICE_GAP   = 140;   // ms of silence between the note ending and the word
   var VOICE_RATE  = 0.9;   // 1 is normal speed
   var VOICE_PITCH = 1.1;   // 1 is normal, higher is brighter
 
@@ -665,9 +666,13 @@
     // Two reasons to wait before speaking. Chrome clips an utterance queued in
     // the same tick as a cancel(), so the queue needs a beat to drain. And when
     // notes are on, the note and the word talked over each other and the result
-    // sounded busy - so hold the word until the note has finished ringing.
-    // Derived from NOTE_DECAY rather than hardcoded, so retuning one fixes both.
-    var wait = (MUSIC && audio) ? Math.max(90, NOTE_DECAY * 1000 + 40) : 90;
+    // sounded busy - so hold the word until the note has finished ringing, then
+    // leave VOICE_GAP of actual silence so the two read as chime-then-word.
+    //
+    // Don't push VOICE_GAP much past 200ms: beyond that the two stop sounding
+    // like one event and just feel laggy, and since the gate is held until the
+    // utterance ends, every extra ms is another ms of presses being dropped.
+    var wait = (MUSIC && audio) ? Math.max(90, NOTE_DECAY * 1000 + VOICE_GAP) : 90;
 
     // Each utterance carries a ticket. A late onend from a cancelled one must
     // not unlock the gate that the newest utterance is holding.

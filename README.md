@@ -51,13 +51,19 @@ she hits at once. Knobs at the top of the `<script>` tag:
 var MUSIC       = true;  // set false for speech only
 var NOTE_VOLUME = 0.20;  // it has its own slot, so it can be present
 var NOTE_DECAY  = 0.22;  // seconds; short enough to finish before the word
+var VOICE_GAP   = 140;   // ms of silence between the note ending and the word
 ```
 
 The note and the word take turns rather than overlapping: the voice waits for
-the note to finish ringing before it starts. That gap is derived from
-`NOTE_DECAY`, so shortening the note also brings the voice in sooner - there is
-nothing separate to keep in sync. With `MUSIC` off there is no note to wait
-for, and the voice starts immediately.
+the note to finish ringing, then leaves `VOICE_GAP` of real silence, so a press
+reads as chime, beat, word. Shortening the note automatically brings the voice
+in sooner - only the silence is set by hand. With `MUSIC` off there is no note
+to wait for and the voice starts immediately.
+
+Don't push `VOICE_GAP` far past 200ms. Beyond that the chime and the word stop
+sounding like one event and just feel slow, and because nothing else can happen
+until the sentence ends, every extra millisecond is another millisecond of her
+presses being ignored.
 
 If it still feels busy, lower `NOTE_VOLUME` first, then `NOTE_DECAY`. The notes are plain sine waves and stop at G5 on purpose: the
 octave above that is where a note starts cutting through speech rather than
