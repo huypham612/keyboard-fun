@@ -23,6 +23,7 @@
     --page: #111111;
     --pad-bg: rgba(255,255,255,0.45);
     --pad-accent: rgba(255,214,232,0.95);
+    --pad-num: rgba(210,231,255,0.95);
   }
 
   /* Follows the system setting, so evening play is not a wall of light.
@@ -46,6 +47,7 @@
       --page: #0b0a10;
       --pad-bg: rgba(10,9,16,0.5);
       --pad-accent: rgba(58,35,48,0.95);
+      --pad-num: rgba(22,39,58,0.95);
     }
   }
 
@@ -113,6 +115,7 @@
 
   #stage {
     display: none;
+    position: relative;   /* confetti anchors to the display, not the viewport */
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -216,7 +219,11 @@
   /* ---------- confetti ---------- */
 
   .confetti {
-    position: fixed;
+    /* Absolute inside #stage rather than fixed to the viewport. On a laptop
+       the two are the same, since #stage fills the screen. On a phone the
+       keys take the lower half, so a viewport-centred burst comes out of the
+       keyboard instead of out of the picture. */
+    position: absolute;
     top: 50%;
     left: 50%;
     width: 1.6vmin;
@@ -279,6 +286,9 @@
     user-select: none;
   }
   .padkey:active { transform: scale(0.93); }
+  /* Three tiers so the run of keys reads as groups rather than one long
+     alphabet: letters plain, numbers blue, the colour and shape keys pink. */
+  .padkey.num { background: var(--pad-num); }
   .padkey.accent { background: var(--pad-accent); }
 
   /* ---------- hint bar ---------- */
@@ -831,7 +841,7 @@
       let bit = document.createElement("div");
       bit.className = "confetti";
       bit.style.background = palette[i % palette.length];
-      document.body.appendChild(bit);
+      stage.appendChild(bit);
 
       var angle = (Math.PI * 2 * i) / n + Math.random() * 0.4;
       var dist = 22 + Math.random() * 30;              // vmin
@@ -1004,10 +1014,10 @@
   function buildPad() {
     var frag = document.createDocumentFragment();
 
-    function key(label, accent, run) {
+    function key(label, cls, run) {
       var b = document.createElement("button");
       b.type = "button";
-      b.className = "padkey" + (accent ? " accent" : "");
+      b.className = "padkey" + (cls ? " " + cls : "");
       b.textContent = label;
       // pointerdown, not click: it fires on touch-down, so it feels immediate.
       b.addEventListener("pointerdown", function (e) {
@@ -1021,14 +1031,14 @@
     }
 
     Object.keys(LETTERS).forEach(function (ch) {
-      key(ch, false, function () { doLetter(ch); });
+      key(ch, "", function () { doLetter(ch); });
     });
     Object.keys(NUMBERS).forEach(function (d) {
-      key(d, false, function () { doNumber(d); });
+      key(d, "num", function () { doNumber(d); });
     });
-    key("\u25C0", true, function () { doColor(-1); });
-    key("\u25B6", true, function () { doColor(1); });
-    key("\u25C6", true, function () { doShape(); });
+    key("\u25C0", "accent", function () { doColor(-1); });
+    key("\u25B6", "accent", function () { doColor(1); });
+    key("\u25C6", "accent", function () { doShape(); });
 
     pad.appendChild(frag);
   }
