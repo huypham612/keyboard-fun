@@ -53,8 +53,13 @@ var NOTE_VOLUME = 0.09;  // kept well under the voice
 var NOTE_DECAY  = 0.22;  // seconds; short enough to finish before the word
 ```
 
-If it feels busy against the voice, lower `NOTE_VOLUME` first, then
-`NOTE_DECAY`. The notes are plain sine waves and stop at G5 on purpose: the
+The note and the word take turns rather than overlapping: the voice waits for
+the note to finish ringing before it starts. That gap is derived from
+`NOTE_DECAY`, so shortening the note also brings the voice in sooner - there is
+nothing separate to keep in sync. With `MUSIC` off there is no note to wait
+for, and the voice starts immediately.
+
+If it still feels busy, lower `NOTE_VOLUME` first, then `NOTE_DECAY`. The notes are plain sine waves and stop at G5 on purpose: the
 octave above that is where a note starts cutting through speech rather than
 sitting under it.
 

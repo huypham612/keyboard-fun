@@ -655,8 +655,13 @@
     clearTimeout(speakTimer);
     try { synth.cancel(); } catch (e) { /* some browsers throw when idle */ }
 
-    // Chrome clips or garbles an utterance queued in the same tick as a
-    // cancel(), which is most of the roughness. Let the queue drain first.
+    // Two reasons to wait before speaking. Chrome clips an utterance queued in
+    // the same tick as a cancel(), so the queue needs a beat to drain. And when
+    // notes are on, the note and the word talked over each other and the result
+    // sounded busy - so hold the word until the note has finished ringing.
+    // Derived from NOTE_DECAY rather than hardcoded, so retuning one fixes both.
+    var wait = (MUSIC && audio) ? Math.max(90, NOTE_DECAY * 1000 + 40) : 90;
+
     // Each utterance carries a ticket. A late onend from a cancelled one must
     // not unlock the gate that the newest utterance is holding.
     var mine = ++speakSeq;
@@ -670,7 +675,7 @@
       u.volume = 1;
       u.onend = u.onerror = function () { if (mine === speakSeq) speaking = false; };
       try { synth.speak(u); } catch (e) { speaking = false; }
-    }, 90);
+    }, wait);
 
     clearTimeout(unlockTimer);
     unlockTimer = setTimeout(function () {
