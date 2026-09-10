@@ -45,6 +45,11 @@ Please don't "simplify" these away without reading why.
   without a modifier, precisely so behaviour does not depend on the lock. A
   regression here shipped once: `'` and `/` reached Firefox and opened Quick
   Find because swallowing was gated on the lock.
+* **Every entrance animation is 520ms.** `.pop`, `.pop2`, `.pop3`, `.pop4` are
+  picked at random per press for freshness, but a slower one would make her
+  wait to see the picture, because pacing is already gated on the voice. Add
+  variants freely; keep the envelope. New ones must also join the
+  `prefers-reduced-motion` rule and the `ENTRANCES` list.
 * **Test in Firefox, not only Chrome.** They differ on Keyboard Lock, on
   which keys have browser-level meaning, and on speech voices.
 
