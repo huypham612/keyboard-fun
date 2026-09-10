@@ -16,10 +16,15 @@ it carries conventions specific to this copy.
 
 Please don't "simplify" these away without reading why.
 
-* **Speech says "A is for Apple", never "A for Apple".** A lone "A" before
-  "for" gets read by speech engines as the word *a*. As the subject of "A
-  is..." it cannot be. This was tested against all 26 letters; the wording is
-  what removed the need for per-letter pronunciation hacks.
+* **Speech says `"A... Apple!"`, and the ellipsis is load-bearing.** It does
+  two jobs: it buys about 300ms of pause from the engine without needing a
+  second utterance, and its sentence break stops a lone letter before a noun
+  being read as the word *a*. Plain `"A Apple"` survives on Samantha
+  (Enhanced) but is one voice change from saying "uh apple", which is the bug
+  this whole area exists to prevent. Do not tidy the ellipsis into a space or
+  a comma.
+* **The pill shows the word alone**, not the letter too - the letter is
+  already on screen at 46vmin beside it.
 * **Pacing waits for the voice to finish**, with `PRESS_DELAY` only as a floor.
   A fixed delay cannot work: phrases run from 0.33s ("Red!") to 2.0s ("Four.
   Four strawberries!"). `VOICE_TIMEOUT` exists because a browser that never

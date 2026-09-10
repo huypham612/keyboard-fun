@@ -829,15 +829,20 @@
     var entry = LETTERS[ch];
     if (!entry) return;
     note(ch.charCodeAt(0) - 65);          // A..Z walk up the scale
-    // "A is for Apple", not "A for Apple". A lone "A" before "for" can be read
-    // as the word "a"; as the subject of "A is..." it cannot be.
-    var line = ch + " is for " + entry[0];
+
+    // "A... Apple!" - the letter, a beat, then the word.
+    //
+    // The ellipsis is doing real work and is not decoration. It buys about
+    // 300ms of pause from the speech engine without a second utterance, and
+    // its sentence break is what stops a lone "A" before a noun being read as
+    // the word "a". Plain "A Apple" happens to survive on this voice but is
+    // one voice change away from saying "uh apple".
     show({
       seed: ch,
       glyph: ch,
       art: pictureItems(entry[1], 1),
-      word: line,
-      speech: line + "!"
+      word: entry[0],                     // the giant letter is already on screen
+      speech: ch + "... " + entry[0] + "!"
     });
   }
 

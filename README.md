@@ -216,13 +216,17 @@ Two details worth knowing:
 * If a browser ever loses an utterance and never reports its end, the toy would
   lock up. `VOICE_TIMEOUT` releases it after 4 seconds regardless.
 
-### Why "A is for Apple"
+### Why "A... Apple!"
 
-The wording matters more than it looks. A lone "A" before "for" can be read by a
-speech engine as the word *a*, which is what made the letter sound wrong at
-first. As the subject of "A **is** for Apple" it cannot be, since an article
-can't be the subject of a sentence. That phrasing fixed it with no special
-cases, and it is the classic alphabet-book wording anyway.
+The voice says the letter, pauses, then the word, and the pill shows only the
+word since the letter is already on screen beside it.
+
+The ellipsis is doing real work. It buys around 300ms of pause out of the
+speech engine without needing a second utterance, and its sentence break is
+what stops a lone letter before a noun being read as the word *a* - the bug
+that made "A" sound wrong in the first place. Plain "A Apple" happens to
+survive on this voice, but a different voice would say "uh apple" again, so
+keep the dots.
 
 ## Changing the words
 
