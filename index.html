@@ -338,7 +338,7 @@
   <button id="play">Let's play!</button>
   <div class="row">
     <label><input type="checkbox" id="fs" checked> Go full screen</label>
-    <label><input type="checkbox" id="snd" checked> Talking voice</label>
+    <label><input type="checkbox" id="snd" checked> Sound</label>
   </div>
 </div>
 
@@ -355,6 +355,8 @@
   var PRESS_DELAY   = 400;    // shortest gap between presses, even for a short word
   var WAIT_FOR_VOICE = true;  // and also wait until the whole phrase has been said
   var VOICE_TIMEOUT = 4000;   // safety net if a browser never reports the end
+  var MUSIC       = true;  // a soft note under each press, so mashing makes a tune
+  var NOTE_VOLUME = 0.16;  // kept well under the voice
   var VOICE_RATE  = 0.9;   // 1 is normal speed
   var VOICE_PITCH = 1.1;   // 1 is normal, higher is brighter
 
@@ -490,6 +492,49 @@
   /* =====================================================================
      VOICE
      ===================================================================== */
+
+  // C major pentatonic. The scale choice is the whole trick: she mashes, and
+  // on a major scale mashed clusters are dissonant and grate within a day.
+  // On a pentatonic there are no wrong combinations - every simultaneous
+  // press sounds intentional.
+  var SCALE = [261.63, 293.66, 329.63, 392.00, 440.00,
+               523.25, 587.33, 659.25, 783.99, 880.00,
+               1046.50, 1174.66, 1318.51];
+
+  var audio = null;
+
+  // Browsers refuse to start audio outside a user gesture, so this is called
+  // from the "Let's play!" click rather than at load.
+  function initAudio() {
+    if (audio || !MUSIC) return;
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    try { audio = new AC(); } catch (e) { audio = null; }
+  }
+
+  function note(i) {
+    if (!MUSIC || !soundOn || !audio) return;
+    if (audio.state === "suspended") { try { audio.resume(); } catch (e) { /* fine */ } }
+
+    var f = SCALE[((i % SCALE.length) + SCALE.length) % SCALE.length];
+    var t = audio.currentTime;
+    var osc = audio.createOscillator();
+    var gain = audio.createGain();
+
+    osc.type = "triangle";               // softer than square, warmer than sine
+    osc.frequency.value = f;
+
+    // Struck-and-decaying, like a small marimba, so it never drones under
+    // the spoken word. exponentialRamp needs a non-zero target.
+    gain.gain.setValueAtTime(0.0001, t);
+    gain.gain.exponentialRampToValueAtTime(NOTE_VOLUME, t + 0.012);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+
+    osc.connect(gain);
+    gain.connect(audio.destination);
+    osc.start(t);
+    osc.stop(t + 0.5);
+  }
 
   var synth = window.speechSynthesis || null;
   var voice = null;
@@ -763,6 +808,7 @@
   function doLetter(ch) {
     var entry = LETTERS[ch];
     if (!entry) return;
+    note(ch.charCodeAt(0) - 65);          // A..Z walk up the scale
     // "A is for Apple", not "A for Apple". A lone "A" before "for" can be read
     // as the word "a"; as the subject of "A is..." it cannot be.
     var line = ch + " is for " + entry[0];
@@ -778,6 +824,7 @@
   function doNumber(d) {
     var entry = NUMBERS[d];
     if (!entry) return;
+    note(parseInt(d, 10));
     var count = parseInt(d, 10);
     var artHtml = count === 0
       ? '<span class="item" style="font-size:30vmin;opacity:.35">🫧</span>'
@@ -800,6 +847,7 @@
     else colorSeen = true;
     var entry = COLORS[colorIndex];
     var name = entry[0], solid = entry[1];
+    note(colorIndex + 3);        // offset so a colour never sounds like a letter
     paintColor(entry);
 
     idle.style.display = "none";
@@ -818,6 +866,7 @@
 
   function doShape() {
     var entry = SHAPES[shapeIndex % SHAPES.length];
+    note(shapeIndex + 7);        // ...and a shape sounds like neither
     shapeIndex++;
     var fill = CONFETTI_COLORS[hashOf(entry[0]) % CONFETTI_COLORS.length];
     show({
@@ -907,6 +956,7 @@
 
   function start() {
     soundOn = sndBox.checked;
+    if (soundOn) initAudio();
 
     if (fsBox.checked && document.documentElement.requestFullscreen) {
       var p = document.documentElement.requestFullscreen();

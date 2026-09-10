@@ -38,6 +38,23 @@ there, however it happened, so the toy is never left running in a window where
 the keyboard and pointer locks do not apply. Getting back in means clicking
 **Let's play!** again.
 
+## The notes
+
+Every press also plays a soft note, so mashing the keyboard makes a tune as
+well as an alphabet. Letters walk up the scale, and numbers, colours and shapes
+each start from a different point so they don't sound alike.
+
+The scale is **pentatonic**, which means no two notes can clash however many
+she hits at once. Knobs at the top of the `<script>` tag:
+
+```js
+var MUSIC       = true;  // set false for speech only
+var NOTE_VOLUME = 0.16;  // kept well under the voice
+```
+
+The **Sound** checkbox on the start screen governs the notes and the voice
+together, so unchecking it gives full silence.
+
 ## Light and dark
 
 The theme follows the system setting automatically, and switches live if macOS
