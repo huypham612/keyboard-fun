@@ -25,6 +25,8 @@
     touch-action: manipulation;
   }
 
+  #app.playing { cursor: none; }
+
   #app {
     position: fixed;
     inset: 0;
@@ -262,7 +264,7 @@
 </div>
 
 <div id="hint">
-  <b>A–Z</b> letters &nbsp;·&nbsp; <b>0–9</b> numbers &nbsp;·&nbsp; <b>↑ →</b> next color &nbsp;·&nbsp; <b>↓ ←</b> color back &nbsp;·&nbsp; <b>space</b> shapes &nbsp;·&nbsp; <b>click</b> both &nbsp;·&nbsp; <b>esc</b> exits full screen
+  <b>A–Z</b> letters &nbsp;·&nbsp; <b>0–9</b> numbers &nbsp;·&nbsp; <b>↑ →</b> next color &nbsp;·&nbsp; <b>↓ ←</b> color back &nbsp;·&nbsp; <b>space</b> shapes &nbsp;·&nbsp; <b>click</b> both &nbsp;·&nbsp; <b>hold esc</b> exits
 </div>
 
 <div id="gate">
@@ -398,6 +400,7 @@
   var colorSeen = false;
   var clickTurn = 0;
   var lastPressAt = 0;
+  var locked = false;
   var speakTimer = null;
   var unlockTimer = null;
   var speaking = false;
@@ -434,6 +437,38 @@
     setTimeout(pickVoice, 300);
     setTimeout(pickVoice, 1200);
   }
+
+  // Keyboard Lock routes system and browser shortcuts to the page instead of
+  // to the browser, so a stray Cmd+W or F5 can't take the toy away mid-play.
+  // Only works in full screen, and macOS keeps a few for itself regardless
+  // (Cmd+Space, Cmd+Q, the hardware Fn keys).
+  function lockKeys() {
+    if (!navigator.keyboard || !navigator.keyboard.lock) return;
+    var p = navigator.keyboard.lock();
+    if (p && p.then) {
+      p.then(function () { locked = true; })
+       .catch(function () { locked = false; });   // not granted; keys behave normally
+    } else {
+      locked = true;
+    }
+  }
+
+  function unlockKeys() {
+    locked = false;
+    if (navigator.keyboard && navigator.keyboard.unlock) {
+      try { navigator.keyboard.unlock(); } catch (e) { /* already gone */ }
+    }
+  }
+
+  // Leaving full screen must hand the keyboard straight back to the adult.
+  document.addEventListener("fullscreenchange", function () {
+    if (document.fullscreenElement) {
+      app.classList.add("playing");
+    } else {
+      app.classList.remove("playing");
+      unlockKeys();
+    }
+  });
 
   function say(text) {
     if (!soundOn || !synth || !text) { speaking = false; return; }
@@ -628,16 +663,24 @@
   }
 
   function onKeyDown(e) {
-    // Let the grown-ups keep their browser shortcuts (Cmd+Q, Ctrl+W, ...).
-    if (e.metaKey || e.ctrlKey || e.altKey) return;
-    if (e.repeat) return;                    // keys get held down; react once
     if (!gate.classList.contains("gone")) return;
 
     var key = e.key;
 
-    // Space and the arrows scroll the page, so swallow them up front, before
-    // the cooldown gets a chance to drop the press.
-    if (key === " " || e.code === "Space" || key.indexOf("Arrow") === 0) e.preventDefault();
+    // While the keyboard is locked every key belongs to us, so swallow the
+    // lot: an unmapped key should do nothing rather than reach the browser.
+    // Escape is deliberately left alone, or holding it could not exit.
+    if (locked && key !== "Escape") {
+      e.preventDefault();
+    } else if (key === " " || e.code === "Space" || key.indexOf("Arrow") === 0) {
+      // Not locked: these still scroll the page, so stop that much at least.
+      e.preventDefault();
+    }
+
+    // Modifier combos never trigger content. Unlocked they pass to the browser
+    // so the adult keeps their shortcuts; locked they were swallowed above.
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.repeat) return;                    // keys get held down; react once
 
     // Work out what the key means first. An unmapped key (tab, enter,
     // punctuation) is ignored on purpose, and must not spend the cooldown or
@@ -680,7 +723,11 @@
 
     if (fsBox.checked && document.documentElement.requestFullscreen) {
       var p = document.documentElement.requestFullscreen();
-      if (p && p.catch) p.catch(function () { /* browser said no; play windowed */ });
+      if (p && p.then) {
+        p.then(lockKeys).catch(function () { /* browser said no; play windowed */ });
+      } else {
+        lockKeys();
+      }
     }
 
     // Speaking once inside the click unlocks the voice in browsers that require a gesture.

@@ -44,6 +44,23 @@ Press `esc` to leave full screen.
   shortcuts still work.
 * Each letter always gets the same background colors, giving a second cue to
   recognize it by.
+* In full screen the app takes a **keyboard lock**, so browser shortcuts
+  (`Cmd+W`, `Cmd+R`, `F5`) and every unmapped key do nothing. **Hold `esc`** to
+  get out. Chrome and Edge support this; on Safari and Firefox the shortcuts
+  keep working and the toy behaves normally otherwise.
+* The mouse pointer is hidden while playing, and only clicks do anything -
+  moving the pointer around has no effect in the page.
+* macOS keeps some keys for itself that **no web page can intercept**. If she
+  finds them, turn them off in System Settings:
+
+  | What she hits | Turn it off in |
+  | --- | --- |
+  | Spotlight (`Cmd+Space`) | Keyboard > Keyboard Shortcuts > Spotlight |
+  | Mission Control / Launchpad (`F3`, `F4`) | Keyboard > Keyboard Shortcuts > Mission Control |
+  | Brightness and volume keys | Keyboard > "Use F1, F2, etc. as standard function keys" |
+  | Trackpad corner triggering things | Desktop & Dock > Hot Corners (set all to `-`) |
+
+  `Cmd+Q` and `Cmd+Tab` cannot be disabled by any of this.
 * Full screen hides the tabs and the address bar, but it cannot stop `Cmd+Q`.
   If you want it properly locked down, launch it in a kiosk window:
 

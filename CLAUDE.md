@@ -32,8 +32,16 @@ Please don't "simplify" these away without reading why.
 * **There is deliberately no voice picker.** An earlier one saved a choice to
   `localStorage`, which pinned users to a worse voice build after they
   installed a better one.
-* **Modifier combos pass straight through** so the adult keeps their shortcuts,
-  and held keys fire once because small children lean on keys.
+* **Modifier combos pass straight through** when the keyboard is not locked,
+  so the adult keeps their shortcuts. Held keys fire once because small
+  children lean on keys.
+* **`Escape` is never `preventDefault`ed, even while the keyboard is locked.**
+  Holding it is the only way out of full screen once the lock is held.
+  Swallowing it traps the user. Do not "tidy" this into the blanket
+  `preventDefault`.
+* **Keyboard Lock is best-effort.** If it is denied, or the browser lacks the
+  API, the toy must still work and shortcuts must keep reaching the browser.
+  Never assume the lock succeeded.
 
 ## Editing content
 
