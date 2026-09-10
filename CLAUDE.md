@@ -64,6 +64,12 @@ same treatment or it will stay light at night.
 The colour disc's outline is `--disc-stroke` and must invert with the theme, or
 the Black disc vanishes on a dark ground and the White one on a light ground.
 
+`CONFETTI_COLORS` is shared by two things that want opposite treatment at
+night. The confetti itself softens to `CONFETTI_NIGHT`, because full-brightness
+scatter over the dimmed background undoes the point of dark mode. The **shapes
+deliberately keep the vivid palette**: one big solid shape reads better bright
+against a dark ground. Don't "fix" the inconsistency by softening both.
+
 ## Editing content
 
 Everything a parent would change sits in one block at the top of the `<script>`

@@ -425,6 +425,12 @@
 
   var CONFETTI_COLORS = ["#ff5fa2", "#ffc93c", "#4dabf7", "#69db7c", "#b197fc", "#ff922b"];
 
+  // Dimmer confetti for night. The dark theme deliberately calms the
+  // background, and firing full-brightness confetti over it undoes that.
+  // Only the confetti softens: the shapes keep the vivid palette above,
+  // because one big solid shape reads better bright against a dark ground.
+  var CONFETTI_NIGHT = ["#b04a75", "#b08c34", "#3a7cb0", "#4d9c5a", "#7d6bb0", "#b06a2a"];
+
   /* =====================================================================
      ELEMENTS + STATE
      ===================================================================== */
@@ -648,10 +654,11 @@
 
   function confetti() {
     var n = 16;
+    var palette = isDark() ? CONFETTI_NIGHT : CONFETTI_COLORS;
     for (var i = 0; i < n; i++) {
       let bit = document.createElement("div");
       bit.className = "confetti";
-      bit.style.background = CONFETTI_COLORS[i % CONFETTI_COLORS.length];
+      bit.style.background = palette[i % palette.length];
       document.body.appendChild(bit);
 
       var angle = (Math.PI * 2 * i) / n + Math.random() * 0.4;
