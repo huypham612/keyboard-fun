@@ -667,10 +667,18 @@
 
     var key = e.key;
 
-    // While the keyboard is locked every key belongs to us, so swallow the
-    // lot: an unmapped key should do nothing rather than reach the browser.
-    // Escape is deliberately left alone, or holding it could not exit.
-    if (locked && key !== "Escape") {
+    // One tap of Escape leaves full screen and hands the keyboard back. The
+    // lock makes Chrome demand a press-and-hold otherwise, which just reads
+    // as a frozen toy. Never preventDefault it: the browser's own
+    // hold-to-exit stays as a backstop if this ever fails.
+    if (key === "Escape") {
+      if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen();
+      return;
+    }
+
+    // While the keyboard is locked every other key belongs to us, so swallow
+    // the lot: an unmapped key should do nothing rather than reach the browser.
+    if (locked) {
       e.preventDefault();
     } else if (key === " " || e.code === "Space" || key.indexOf("Arrow") === 0) {
       // Not locked: these still scroll the page, so stop that much at least.
