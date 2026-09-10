@@ -68,8 +68,12 @@ keeps Black and White visible.
   ```
   open -a "Google Chrome" index.html
   ```
-* The mouse pointer is hidden while playing, and only clicks do anything -
-  moving the pointer around has no effect in the page.
+* In full screen the app takes a **pointer lock**: the cursor is removed from
+  the system entirely, so moving the mouse or trackpad goes nowhere at all - it
+  cannot reach the menu bar, the Dock, a hot corner or a second display.
+  Clicking still works. Leaving full screen gives the pointer straight back.
+  If the browser refuses the lock the toy still works, just with a visible
+  cursor.
 * macOS keeps some keys for itself that **no web page can intercept**. If she
   finds them, turn them off in System Settings:
 

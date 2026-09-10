@@ -496,6 +496,27 @@
     }
   }
 
+  // Hiding the cursor with CSS only hides it: the pointer still exists and can
+  // wander onto the menu bar or another display. Pointer Lock takes it out of
+  // the system entirely, so movement goes nowhere while clicks still land.
+  function lockPointer() {
+    if (!app.requestPointerLock) return;
+    try {
+      var r = app.requestPointerLock();
+      if (r && r.catch) r.catch(function () { /* denied; CSS still hides it */ });
+    } catch (e) { /* older browsers throw instead of rejecting */ }
+  }
+
+  function unlockPointer() {
+    if (document.pointerLockElement && document.exitPointerLock) {
+      try { document.exitPointerLock(); } catch (e) { /* already released */ }
+    }
+  }
+
+  document.addEventListener("pointerlockerror", function () {
+    /* nothing to do: the toy works fine with a visible pointer */
+  });
+
   function unlockKeys() {
     locked = false;
     if (navigator.keyboard && navigator.keyboard.unlock) {
@@ -507,9 +528,11 @@
   document.addEventListener("fullscreenchange", function () {
     if (document.fullscreenElement) {
       app.classList.add("playing");
+      lockPointer();
     } else {
       app.classList.remove("playing");
       unlockKeys();
+      unlockPointer();
     }
   });
 
@@ -786,7 +809,12 @@
     hintTimer = setTimeout(function () { hint.classList.add("hide"); }, 6000);
   }
 
-  window.addEventListener("mousemove", nudgeHint);
+  window.addEventListener("mousemove", function () {
+    // Under pointer lock every twitch fires this, and flashing the hint bar
+    // back up on each one is just noise.
+    if (document.pointerLockElement) return;
+    nudgeHint();
+  });
 
   /* =====================================================================
      START
