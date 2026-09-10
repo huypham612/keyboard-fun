@@ -72,6 +72,20 @@ sitting under it.
 The **Sound** checkbox on the start screen governs the notes and the voice
 together, so unchecking it gives full silence.
 
+## On a phone or tablet
+
+There is no keyboard on a touch device, so without help not a single letter is
+reachable there. On a coarse pointer the app shows an on-screen grid instead:
+A-Z, 0-9, and three more for colour back, colour forward and shapes. Each key
+does exactly what the physical one does, cooldown and all.
+
+Nothing changes on a laptop - the grid is never built there. Add `?keys` to the
+URL to force it on for a look.
+
+Two honest limits on iOS: there is no Keyboard Lock API and iPhone Safari has
+no full screen at all, so the containment that makes the laptop version safe
+does not exist. On a phone this is a fun toy, not a locked-down one.
+
 ## Light and dark
 
 The theme follows the system setting automatically, and switches live if macOS

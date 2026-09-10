@@ -71,6 +71,22 @@ Please don't "simplify" these away without reading why.
 * **Test in Firefox, not only Chrome.** They differ on Keyboard Lock, on
   which keys have browser-level meaning, and on speech voices.
 
+## Touch
+
+The on-screen key grid is built only when `(pointer: coarse)` matches, or `?keys`
+is in the URL. **A laptop must be completely unaffected** - no grid built, no
+layout change, no hint bar hidden.
+
+Pad keys go through the same `ready()` gate as physical keys, or mashing the
+grid would bypass the cooldown entirely. They also `stopPropagation()`, or the
+tap-anywhere-cycles handler fires a shape on top of every keypress.
+
+Note that `#app` is `overflow: hidden`, so **checking
+`documentElement.scrollWidth` will not detect a pad that overflows** - measure
+the pad itself. Headless Chrome also clamps `--window-size` to a 500px minimum
+width, so a narrow phone viewport has to be faked with a sized iframe or the
+screenshot is just a crop of a wider render.
+
 ## Theming
 
 Colours live in CSS custom properties on `:root`, with a
