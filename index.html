@@ -405,7 +405,6 @@
   <p>A letter, a picture and a friendly voice for every key they press. Tap the button once so the browser lets us talk.</p>
   <button id="play">Let's play!</button>
   <div class="row">
-    <label><input type="checkbox" id="fs" checked> Go full screen</label>
     <label><input type="checkbox" id="snd" checked> Sound</label>
   </div>
 </div>
@@ -569,7 +568,6 @@
   var hint  = document.getElementById("hint");
   var gate  = document.getElementById("gate");
   var playBtn = document.getElementById("play");
-  var fsBox   = document.getElementById("fs");
   var sndBox  = document.getElementById("snd");
 
   var soundOn = true;
@@ -1135,7 +1133,12 @@
     soundOn = sndBox.checked;
     if (soundOn) initAudio();
 
-    if (fsBox.checked && document.documentElement.requestFullscreen) {
+    // Always full screen. Every protection here - the keyboard lock, the
+    // pointer lock, returning to this screen on exit - exists only in full
+    // screen, so an option to skip it would only ever be an option to turn
+    // all of that off. If the browser refuses (iPhone Safari has no full
+    // screen at all) play carries on windowed.
+    if (document.documentElement.requestFullscreen) {
       var p = document.documentElement.requestFullscreen();
       if (p && p.then) {
         p.then(lockKeys).catch(function () { /* browser said no; play windowed */ });
@@ -1163,7 +1166,6 @@
   }
 
   playBtn.addEventListener("click", start);
-  fsBox.addEventListener("click", function (e) { e.stopPropagation(); });
   sndBox.addEventListener("click", function (e) { e.stopPropagation(); });
 
   window.addEventListener("keydown", onKeyDown);

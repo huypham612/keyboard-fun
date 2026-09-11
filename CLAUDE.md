@@ -47,6 +47,11 @@ Please don't "simplify" these away without reading why.
 * **Modifier combos pass straight through** when the keyboard is not locked,
   so the adult keeps their shortcuts. Held keys fire once because small
   children lean on keys.
+* **Full screen is not optional and there is no checkbox for it.** The
+  keyboard lock, the pointer lock and returning home on exit all exist only in
+  full screen, so an opt-out would only ever be an opt-out of every protection
+  at once. It is requested unconditionally and simply allowed to fail where
+  the browser has no full screen (iPhone Safari).
 * **`Escape` is never `preventDefault`ed, even while the keyboard is locked.**
   Holding it is the only way out of full screen once the lock is held.
   Swallowing it traps the user. Do not "tidy" this into the blanket

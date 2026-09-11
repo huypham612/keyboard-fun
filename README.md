@@ -33,10 +33,15 @@ and round.
 Fourteen shapes: circle, square, triangle, rectangle, star, heart, oval,
 diamond, moon, pentagon, hexagon, octagon, arrow, cross.
 
+Playing always means full screen - there is no option not to. Every protection
+here (the keyboard lock, the pointer lock, returning to the start screen on
+exit) exists only in full screen, so a switch to skip it would only ever be a
+switch to turn all of it off. Where the browser refuses, iPhone Safari most
+notably, play carries on in a window.
+
 Press `esc` to go back to the start screen. Leaving full screen always returns
 there, however it happened, so the toy is never left running in a window where
-the keyboard and pointer locks do not apply. Getting back in means clicking
-**Let's play!** again.
+the locks do not apply. Getting back in means clicking **Let's play!** again.
 
 ## The notes
 
